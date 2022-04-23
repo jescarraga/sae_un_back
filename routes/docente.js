@@ -4,19 +4,26 @@ const database = require('../database');
 
 const docenteRouter = express.Router();
 
+
+/*
+    Allows the creation of querys and responses with promise to handle it
+*/
 function quieryCreator(theQuery){
     return (
         new Promise((resolve, reject) => {
             database.query(theQuery, (err, res1) => {
-                if(err){
-                    resolve(err);
-                }else{
-                    resolve(res1);
-                }
-                
-            })
+                if(err) resolve(err);
+                else resolve(res1);   
+            });
         })
     );
+}
+
+/*
+    Prototype of function that responses with a NULL value
+*/
+sendNull = (req, res, next) => {
+    res.send(null);
 }
 
 
@@ -28,20 +35,14 @@ docenteRouter.route('/docente')
         res.setHeader('Content-Type', 'text/plain');
         next();
     })
-    .get((req, res, next) => {
-        quieryCreator('select * from public.usuario;')
-        .then((datas) => { res.end(JSON.stringify(datas.rows)) });
-    })
     .post((req, res, next) => {
-        //Codigo mega chambón no se hace nunca solo es un test perdóname diosito
-        res.end('will put? something');
+        var solicitude = req.body;
+        
+        res.send('will put? something');
     })
-    .put((req, res, next) => {
-        res.end('will put? something');
-    })
-    .delete((req, res, next) => {
-        res.end('will delete something');
-    });
+    .get(sendNull)
+    .put(sendNull)
+    .delete(sendNull);
 
 
 module.exports = docenteRouter;

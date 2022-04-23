@@ -1,6 +1,6 @@
 # Un Sae Back 📋
 
-_Back-End exprees proyecto Un sae 2.0_
+_Back-End express proyecto Un sae 2.0_
 
 ### Instalación 🔧
 

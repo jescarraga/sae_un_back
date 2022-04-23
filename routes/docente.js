@@ -8,12 +8,12 @@ const docenteRouter = express.Router();
 /*
     Allows the creation of querys and responses with promise to handle it
 */
-function quieryCreator(theQuery){
+function quieryCreator(theQuery) {
     return (
         new Promise((resolve, reject) => {
             database.query(theQuery, (err, res1) => {
-                if(err) resolve(err);
-                else resolve(res1);   
+                if (err) resolve(err);
+                else resolve(res1);
             });
         })
     );
@@ -36,9 +36,36 @@ docenteRouter.route('/docente')
         next();
     })
     .post((req, res, next) => {
-        var solicitude = req.body;
+        var request = req.body;
+
+        var test = {
+            documento: "",
+            nombres: "",
+            apellidos: "",
+            usuario_un: "",
+            estado: "",
+            sexo: "",
+            id_tipo_usuario: "",
+            id_departamento: "",
+        }
         
-        res.send('will put? something');
+        
+        quieryCreator(
+            `INSERT INTO public.usuario(documento, nombres, apellidos, usuario_un, estado, sexo) 
+                VALUES (
+                    '${request.documento}', 
+                    '${request.nombres}', 
+                    '${request.apellidos}', 
+                    '${request.usuario_un}', 
+                    '${request.estado}', 
+                    '${request.sexo}');`
+        )
+        .then((result) => {res.send(result.command)})
+        .catch(()=> {res.send(null)});
+
+        
+
+
     })
     .get(sendNull)
     .put(sendNull)

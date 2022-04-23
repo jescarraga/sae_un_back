@@ -5,6 +5,7 @@ var createError = require('http-errors');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
+var docenteRouter = require('./routes/docente');
 
 var app = express();
 
@@ -17,7 +18,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser());
 
-app.use('/', indexRouter);
+app.use('/', indexRouter); 
+app.use('/',docenteRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

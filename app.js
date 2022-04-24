@@ -5,7 +5,7 @@ var createError = require('http-errors');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var docenteRouter = require('./routes/docente');
+var docenteRouter = require('./routes/ingresoDocente');
 
 var app = express();
 

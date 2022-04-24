@@ -40,7 +40,7 @@ docenteRouter.route('/docente')
 
         if (request.id_tipo_usuario == 2) {
 
-            prom1 = quieryCreator(
+            quieryCreator(
                 `INSERT INTO public.usuario(documento, nombres, apellidos, usuario_un, estado, sexo) 
                     VALUES (
                         '${request.documento}', 
@@ -51,41 +51,47 @@ docenteRouter.route('/docente')
                         '${request.sexo}');`
             )
                 .then((result) => {
+
+                    if(!result.command){
+                        res.send(result+ "");
+                        return;
+                    }
+
                     prom2 = quieryCreator(
                         `INSERT INTO public.docente(documento, id_departamento) values('${request.documento}','${request.id_departamento}');`
                     )
                         .then((result) => {
-                            return result.command;
+                            return result;
                         })
-                        .catch(() => {
-                            return null;
+                        .catch((err) => {
+                            return "Error conexion BD Tabla docente: " + err;
                         });
 
                     prom3 = quieryCreator(
                         `INSERT INTO public.perfil(id_tipo_usuario, documento) values('${request.id_tipo_usuario}','${request.documento}')`
                     )
                         .then((result) => {
-                            return result.command;
+                            return result;
                         })
-                        .catch(() => {
-                            return null;
+                        .catch((err) => {
+                            return "Error conexion BD Tabla docente: " + err;
                         });
 
 
                     Promise.all([prom2, prom3]).then(([r1, r2]) => {
-                        if(r1 && r2 && result.command){
-                            res.send('Successful inserted');
-                        }else{
-                            res.send(null);
+                        if (r1.command && r2.command && result.command) {
+                            res.send(true);
+                        } else {
+                            res.send(r1 + "\n" + r2 + "\n" + result);
                         }
-                        
+
                     });
                 })
-                .catch(() => {
-                    return null;
+                .catch((err) => {
+                    res.send("Error conexion BD Tabla usuarios: " + err);
                 });
         } else {
-            res.send(null);
+            res.send("Se requiere un usuario tipo docente");
         }
     })
     .get(sendNull)

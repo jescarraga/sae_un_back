@@ -53,7 +53,7 @@ docenteRouter.route('/docente')
                 .then((result) => {
 
                     if(!result.command){
-                        res.send(result+ "");
+                        res.send("No es posible ingresar un usuario con esos datos: "+ result.detail);
                         return;
                     }
 

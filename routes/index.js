@@ -34,8 +34,6 @@ indexRouter.route('/')
     .post((req, res, next) => {
         var request = req.body;
 
-
-        
         prom1 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.usuario_un_p}';`
             ).then((result) => {
@@ -45,8 +43,7 @@ indexRouter.route('/')
                     return "false";
                 }
             })
-        .catch(()=> {res.end("Error al recibir")});
-
+        .catch(()=> {return null});
         
         prom2 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like
@@ -60,7 +57,7 @@ indexRouter.route('/')
                 return "false";
             }
         })
-        .catch(()=> {res.end("Error al recibir")});
+        .catch(()=> {return null});
         
         prom3 = queryCreator(
             `SELECT id_tipo_usuario from 
@@ -69,33 +66,22 @@ indexRouter.route('/')
         ).then((result) => {
             return result.rows[0].id_tipo_usuario;
         })
-        .catch(()=> {res.end("Error al recibir")});
+        .catch(()=> {return null});
 
-
-        
         Promise.all([prom1,prom2]).then(([r1,r2]) => {
             respuesta = {};
             respuesta.encontro_al_usuario = r1;
             respuesta.usuario_y_contraseña = r2;
             
-            
             if(r1 == "true" && r2 == "true"){
-                
                 prom3.then((r3) => {
                     respuesta.tipoUsuario = r3;
                     res.send(respuesta);
                 });
-                
             }else{
                 res.send(respuesta);
             }
-            
         })
-        
-
-        
-        
-        //respuesta.encontro_al_usuario = result.rows[0].count;
     }
     )
     .put(sendNull)

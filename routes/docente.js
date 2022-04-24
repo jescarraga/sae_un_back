@@ -38,34 +38,55 @@ docenteRouter.route('/docente')
     .post((req, res, next) => {
         var request = req.body;
 
-        var test = {
-            documento: "",
-            nombres: "",
-            apellidos: "",
-            usuario_un: "",
-            estado: "",
-            sexo: "",
-            id_tipo_usuario: "",
-            id_departamento: "",
+        if (request.id_tipo_usuario == 2) {
+
+            prom1 = quieryCreator(
+                `INSERT INTO public.usuario(documento, nombres, apellidos, usuario_un, estado, sexo) 
+                    VALUES (
+                        '${request.documento}', 
+                        '${request.nombres}', 
+                        '${request.apellidos}', 
+                        '${request.usuario_un}', 
+                        '${request.estado}', 
+                        '${request.sexo}');`
+            )
+                .then((result) => {
+                    prom2 = quieryCreator(
+                        `INSERT INTO public.docente(documento, id_departamento) values('${request.documento}','${request.id_departamento}');`
+                    )
+                        .then((result) => {
+                            return result.command;
+                        })
+                        .catch(() => {
+                            return null;
+                        });
+
+                    prom3 = quieryCreator(
+                        `INSERT INTO public.perfil(id_tipo_usuario, documento) values('${request.id_tipo_usuario}','${request.documento}')`
+                    )
+                        .then((result) => {
+                            return result.command;
+                        })
+                        .catch(() => {
+                            return null;
+                        });
+
+
+                    Promise.all([prom2, prom3]).then(([r1, r2]) => {
+                        if(r1 && r2 && result.command){
+                            res.send('Successful inserted');
+                        }else{
+                            res.send(null);
+                        }
+                        
+                    });
+                })
+                .catch(() => {
+                    return null;
+                });
+        } else {
+            res.send(null);
         }
-        
-        
-        quieryCreator(
-            `INSERT INTO public.usuario(documento, nombres, apellidos, usuario_un, estado, sexo) 
-                VALUES (
-                    '${request.documento}', 
-                    '${request.nombres}', 
-                    '${request.apellidos}', 
-                    '${request.usuario_un}', 
-                    '${request.estado}', 
-                    '${request.sexo}');`
-        )
-        .then((result) => {res.send(result.command)})
-        .catch(()=> {res.send(null)});
-
-        
-
-
     })
     .get(sendNull)
     .put(sendNull)

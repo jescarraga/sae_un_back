@@ -4,7 +4,25 @@ const database = require('../database');
 
 const indexRouter = express.Router();
 
+// the system is going to use JSON fromat
 indexRouter.use(bodyParser.json());
+
+//function that responses with a null value
+sendNull = (req, res, next) =>{
+    res.send(null);
+}
+
+//query maker and handler
+function queryCreator(theQuery){
+    return(
+        new Promise((resolve, reject) =>{
+            database.query(theQuery,(err, res1)=>{
+                if (err) resolve(err);
+                else resolve(res1);
+            })
+        })
+    )
+}
 
 indexRouter.route('/')
     .all((req, res, next) => {
@@ -12,49 +30,68 @@ indexRouter.route('/')
         res.setHeader('Content-Type', 'text/plain');
         next();
     })
-    .get((req, res, next) => {
-    
-        const data = () => {
-            return (
-                new Promise((resolve, reject) => {
-                    database.query('select * from public.usuario;', (err, res1) => {
-                        if(err){
-                            resolve(err);
-                        }else{
-                            resolve(res1);
-                        }
-                        
-                    })
-                })
-            );
-        }
-
-        data().then((datas) => { res.end(JSON.stringify(datas)) });
-    })
+    .get(sendNull)
     .post((req, res, next) => {
-        //Codigo mega chambón no se hace nunca solo es un test perdóname diosito
+        var request = req.body;
 
-        var miq = req.body.miquery;
-        const data = () => {
-            return (
-                new Promise((resolve, reject) => {
-                    database.query(miq, (err, res1) => {
-                        resolve(res1);
-                    })
-                })
-            );
-        }
 
-        data()
-        .then((datas) => {res.end(JSON.stringify(datas.rows))})
-        .catch((err) => res.end("no funciona, error: "+ err));
-    })
-    .put((req, res, next) => {
-        res.end('will put? something' + req.body.miquery + '  ' + req.body.description);
-    })
-    .delete((req, res, next) => {
-        res.end('will delete something' + req.body.name + '  ' + req.body.description);
-    });
+        
+        prom1 = queryCreator(
+            `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.usuario_un_p}';`
+            ).then((result) => {
+                if(result.rows[0].count == 1){
+                    return "True";
+                }else{
+                    return "False";
+                }
+            })
+        .catch(()=> {res.end("Error al recibir")});
+
+        
+        prom2 = queryCreator(
+            `SELECT COUNT(1) FROM password WHERE usuario_un_p like
+                '${request.usuario_un_p}'
+                and password_usuario like 
+                '${request.password_usuario}';`
+        ).then((result) => {
+            if(result.rows[0].count == 1){
+                return "True";
+            }else{
+                return "False";
+            }
+        })
+        .catch(()=> {res.end("Error al recibir")});
+        
+        prom3 = queryCreator(
+            `SELECT id_tipo_usuario from 
+            (SELECT documento FROM usuario where usuario_un like '${request.usuario_un_p}') as resultado
+            left join perfil on resultado.documento = perfil.documento;`
+        ).then((result) => {
+            return result.rows[0].id_tipo_usuario)         
+        })
+        .catch(()=> {res.end("Error al recibir")});
+
+
+        
+        Promise.all([prom1,prom2]).then(([r1,r2]) => {
+            respuesta = {};
+            respuesta.encontro_al_usuario = r1;
+            respuesta.usuario_y_contraseña = r2;
+            
+
+            if(r1 == True && r2 == True){
+                prom3.then((r3) => {res.send(r3)});
+            }
+        })
+        
+
+        
+        
+        //respuesta.encontro_al_usuario = result.rows[0].count;
+    }
+    )
+    .put(sendNull)
+    .delete(sendNull);
 
 
 module.exports = indexRouter;

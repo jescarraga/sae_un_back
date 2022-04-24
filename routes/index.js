@@ -7,9 +7,13 @@ const indexRouter = express.Router();
 // the system is going to use JSON fromat
 indexRouter.use(bodyParser.json());
 
+const obje={
+    saludo : "Error"
+}
+
 //function that responses with a null value
 sendNull = (req, res, next) =>{
-    res.send(null);
+    res.send(obje);
 }
 
 //query maker and handler

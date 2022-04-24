@@ -24,7 +24,7 @@ function queryCreator(theQuery){
     )
 }
 
-indexRouter.route('/auth')
+indexRouter.route('/IngresoEstudiante')
     .all((req, res, next) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'text/plain');
@@ -35,7 +35,7 @@ indexRouter.route('/auth')
         var request = req.body;
 
         prom1 = queryCreator(
-            `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.username}';`
+            `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.usuario_un_p}';`
             ).then((result) => {
                 if(result.rows[0].count == 1){
                     return "true";
@@ -47,9 +47,9 @@ indexRouter.route('/auth')
         
         prom2 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like
-                '${request.username}'
+                '${request.usuario_un_p}'
                 and password_usuario like 
-                '${request.password}';`
+                '${request.password_usuario}';`
         ).then((result) => {
             if(result.rows[0].count == 1){
                 return "true";
@@ -61,7 +61,7 @@ indexRouter.route('/auth')
         
         prom3 = queryCreator(
             `SELECT id_tipo_usuario from 
-            (SELECT documento FROM usuario where usuario_un like '${request.username}') as resultado
+            (SELECT documento FROM usuario where usuario_un like '${request.usuario_un_p}') as resultado
             left join perfil on resultado.documento = perfil.documento;`
         ).then((result) => {
             return result.rows[0].id_tipo_usuario;

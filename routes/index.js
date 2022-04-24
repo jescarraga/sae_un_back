@@ -80,10 +80,10 @@ indexRouter.route('/auth')
             if(r1 == "true" && r2 == "true"){
                 prom3.then((r3) => {
                     respuesta.tipoUsuario = r3;
-                    res.send(respuesta);
+                    res.json(respuesta);
                 });
             }else{
-                res.send(respuesta);
+                res.json(respuesta);
             }
         })
     }

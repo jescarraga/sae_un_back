@@ -40,9 +40,9 @@ indexRouter.route('/')
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.usuario_un_p}';`
             ).then((result) => {
                 if(result.rows[0].count == 1){
-                    return "True";
+                    return "true";
                 }else{
-                    return "False";
+                    return "false";
                 }
             })
         .catch(()=> {res.end("Error al recibir")});
@@ -55,9 +55,9 @@ indexRouter.route('/')
                 '${request.password_usuario}';`
         ).then((result) => {
             if(result.rows[0].count == 1){
-                return "True";
+                return "true";
             }else{
-                return "False";
+                return "false";
             }
         })
         .catch(()=> {res.end("Error al recibir")});
@@ -67,7 +67,7 @@ indexRouter.route('/')
             (SELECT documento FROM usuario where usuario_un like '${request.usuario_un_p}') as resultado
             left join perfil on resultado.documento = perfil.documento;`
         ).then((result) => {
-            return result.rows[0].id_tipo_usuario)         
+            return result.rows[0].id_tipo_usuario;
         })
         .catch(()=> {res.end("Error al recibir")});
 
@@ -78,10 +78,18 @@ indexRouter.route('/')
             respuesta.encontro_al_usuario = r1;
             respuesta.usuario_y_contraseña = r2;
             
-
-            if(r1 == True && r2 == True){
-                prom3.then((r3) => {res.send(r3)});
+            
+            if(r1 == "true" && r2 == "true"){
+                
+                prom3.then((r3) => {
+                    respuesta.tipoUsuario = r3;
+                    res.send(respuesta);
+                });
+                
+            }else{
+                res.send(respuesta);
             }
+            
         })
         
 

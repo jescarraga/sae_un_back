@@ -27,7 +27,10 @@ function queryCreator(theQuery){
 indexRouter.route('/auth')
     .all((req, res, next) => {
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
+        res.set({
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+        });
         next();
     })
     .get(sendNull)

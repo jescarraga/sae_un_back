@@ -86,6 +86,7 @@ indexRouter.route('/auth')
                 "encontro_al_usuario": r1,
                 "usuario_y_contraseña":r2,
                 "tipoUsuario":r3,
+                "usuario_registrado":request.username,
                 "status":false
             };
 

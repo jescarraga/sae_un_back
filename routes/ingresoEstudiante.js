@@ -67,36 +67,48 @@ docenteRouter.route('/docente')
                             return result;
                         })
                         .catch((err) => {
-                            return "Error conexion BD Tabla docente: " + err;
-                        });
-
-                    prom2 = quieryCreator(
-                        `INSERT INTO public.datos(documento, codigo, fecha_ingreso, cursando)
-                        values('${request.documento}','${request.codigo}','${request.fecha_ingreso}','${request.cursando}');`
-                    )
-                        .then((result) => {
-                            return result;
-                        })
-                        .catch((err) => {
-                            return "Error conexion BD Tabla docente: " + err;
+                            return "Error conexion BD Tabla estado semestre: " + err;
                         });
 
                     prom3 = quieryCreator(
-                        `INSERT INTO public.perfil(id_tipo_usuario, documento) values('${request.id_tipo_usuario}','${request.documento}')`
+                        `INSERT INTO public.datos(documento, documento_nacional)
+                        values('${request.documento}','${request.documento_nacional}');`
                     )
                         .then((result) => {
                             return result;
                         })
                         .catch((err) => {
-                            return "Error conexion BD Tabla docente: " + err;
+                            return "Error conexion BD Tabla datos: " + err;
+                        });
+                    
+                    prom4 = quieryCreator(
+                        `INSERT INTO public.informacion_academica(documento)
+                        values('${request.documento}');`
+                    )
+                        .then((result) => {
+                            return result;
+                        })
+                        .catch((err) => {
+                            return "Error conexion BD Tabla informacion academica: " + err;
+                        });    
+
+                    prom5 = quieryCreator(
+                        `INSERT INTO public.perfil(id_tipo_usuario, documento) 
+                        values('${request.id_tipo_usuario}','${request.documento}')`
+                    )
+                        .then((result) => {
+                            return result;
+                        })
+                        .catch((err) => {
+                            return "Error conexion BD Tabla perfil: " + err;
                         });
 
 
-                    Promise.all([prom2, prom3]).then(([r1, r2]) => {
-                        if (r1.command && r2.command && result.command) {
+                    Promise.all([prom2, prom3,prom4, prom5]).then(([r2, r3, r4, r5]) => {
+                        if (r2.command && r3.command && r4.command && r5.command && result.command) {
                             return res.send({status: true});
                         } else {
-                            var resp = {status: r1 + "\n" + r2 + "\n" + result};
+                            var resp = {status: r2 + "\n" + r3 + "\n" + r4 + "\n" + r5 + "\n" + result};
                             return res.send(resp);
                         }
 
@@ -106,7 +118,7 @@ docenteRouter.route('/docente')
                     return res.send({status:"Error conexion BD Tabla usuarios: " + err});
                 });
         } else {
-            return res.send({status:"Se requiere un usuario tipo docente"});
+            return res.send({status:"Se requiere un usuario tipo estudiante"});
         }
     })
     .get(sendNull)

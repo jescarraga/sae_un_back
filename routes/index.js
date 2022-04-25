@@ -37,8 +37,9 @@ indexRouter.route('/auth')
         res.send({"mensaje":"Hola"});
     })
     .post((req, res, next) => {
-        var request = JSON.parse(req.body);
+        console.log(req)
         console.log(req.body);
+        var request = req.body;
 
         prom1 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.username}';`

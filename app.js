@@ -39,4 +39,8 @@ app.use((err, req, res, next) => {
   res.render('error');
 });
 
+// app.listen( 3500, () =>{
+//   console.log('corriendo el proyectico')
+// })
+
 module.exports = app;

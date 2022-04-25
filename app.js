@@ -5,7 +5,9 @@ var createError = require('http-errors');
 var logger = require('morgan');
 var cors = require('cors');
 
+
 var indexRouter = require('./routes/index');
+var docenteRouter = require('./routes/ingresoDocente');
 
 var bienestarRouter = require('./routes/bienestar');
 var ingresoEstudianteRouter = require('./routes/ingresoEstudiante');
@@ -17,15 +19,17 @@ var app = express();
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'pug');
-
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
+
 app.use('/', indexRouter);
 app.use('/', ingresoEstudianteRouter);
 app.use('/', bienestarRouter);
+app.use('/',docenteRouter);
 
 
 // catch 404 and forward to error handler

@@ -28,13 +28,13 @@ indexRouter.route('/bienestar')
                             //console.log(typeof(res1[0]))
                             //console.log(res1)
                             //console.log(res1[0].rowCount)
-                            if (res1[0].rowCount>0){
+                            if (res1[0].rowCount > 0) {
                                 resolve(Object.assign(res1[0].rows[0], res1[1].rows[0]));
                             } else {
                                 res.status(404);
-                                resolve({"message": "User not found"})
+                                resolve({ "message": "User not found" })
                             }
-                            
+
                         }
                     });
                 })
@@ -43,37 +43,42 @@ indexRouter.route('/bienestar')
 
         data(documento).then((datas) => { res.json(datas) });
 
-        
+
     })
     .post((req, res, next) => {
 
         var toInsert = req.body;
         console.log(toInsert);
         const data = (toInsert) => {
+
             return (
                 new Promise((resolve, reject) => {
+                    
                     database.query(`INSERT INTO public.usuario(
                         documento, nombres, apellidos, usuario_un, estado, sexo)
-                        VALUES ('${toInsert.documento}', '${toInsert.nombres}', '${toInsert.apellidos}', '${toInsert.usuario_un}', ${toInsert.estado}, ${toInsert.sexo});
+                        VALUES ('${toInsert.documento}', '${toInsert.nombres}', '${toInsert.apellidos}', '${toInsert.usuario_un}', '${toInsert.estado}', '${toInsert.sexo}');
                         INSERT INTO public.perfil(
                             id_tipo_usuario, documento)
                             VALUES (3 , '${toInsert.documento}');`, (err, res1) => {
+
                         if (err) {
                             res.status(500);
                             resolve(err);
                         }
+
                         var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
                         console.log(fullUrl);
+
                         axios.get(`${fullUrl}?documento=${toInsert.documento}`).then(function (response) {
                             // handle success
                             resolve(response.data);
-                          })
-                          .catch(function (error) {
-                            // handle error
-                            res.status(500);
-                            resolve(error);
-                          })
-                        
+                        })
+                            .catch(function (error) {
+                                // handle error
+                                res.status(500);
+                                resolve(error);
+                            })
+
                     })
                 })
             );
@@ -81,11 +86,11 @@ indexRouter.route('/bienestar')
 
         data(toInsert)
             .then((datas) => { res.json(datas) })
-            .catch((err) => {res.end("no funciona, error: " + err); res.status(500)}); 
-            
+            .catch((err) => { res.end("no funciona, error: " + err); res.status(500) });
+
     })
     .put((req, res, next) => {
-        res.end('will put? something' + req.body.miquery + '  ' + req.body.description);
+        res.end('will put something' + req.body.miquery + '  ' + req.body.description);
     })
     .delete((req, res, next) => {
         res.end('will delete something' + req.body.name + '  ' + req.body.description);

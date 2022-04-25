@@ -32,7 +32,6 @@ docenteRouter.use(bodyParser.json());
 docenteRouter.route('/docente')
     .all((req, res, next) => {
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
         next();
     })
     .post((req, res, next) => {
@@ -53,7 +52,8 @@ docenteRouter.route('/docente')
                 .then((result) => {
 
                     if(!result.command){
-                        res.send("No es posible ingresar un usuario con esos datos: "+ result.detail);
+                        var envio = {status:"No es posible ingresar un usuario con esos datos: "+ result.detail};
+                        res.send(envio);
                         return;
                     }
 
@@ -80,18 +80,19 @@ docenteRouter.route('/docente')
 
                     Promise.all([prom2, prom3]).then(([r1, r2]) => {
                         if (r1.command && r2.command && result.command) {
-                            res.send(true);
+                            return res.send({status: true});
                         } else {
-                            res.send(r1 + "\n" + r2 + "\n" + result);
+                            var resp = {status: r1 + "\n" + r2 + "\n" + result};
+                            return res.send(resp);
                         }
 
                     });
                 })
                 .catch((err) => {
-                    res.send("Error conexion BD Tabla usuarios: " + err);
+                    return res.send({status:"Error conexion BD Tabla usuarios: " + err});
                 });
         } else {
-            res.send("Se requiere un usuario tipo docente");
+            return res.send({status:"Se requiere un usuario tipo docente"});
         }
     })
     .get(sendNull)

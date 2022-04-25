@@ -48,6 +48,7 @@ indexRouter.route('/auth')
         prom1 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.username}';`
             ).then((result) => {
+                
                 if(result.rows[0].count == 1){
                     return "true";
                 }else{
@@ -62,6 +63,7 @@ indexRouter.route('/auth')
                 and password_usuario like 
                 '${request.password}';`
         ).then((result) => {
+            
             if(result.rows[0].count == 1){
                 return "true";
             }else{
@@ -80,14 +82,16 @@ indexRouter.route('/auth')
         .catch(()=> {res.send(obje)});
 
         Promise.all([prom1,prom2]).then(([r1,r2]) => {
-            respuesta = {};
-            respuesta.encontro_al_usuario = r1;
-            respuesta.usuario_y_contraseña = r2;
-            
+            respuesta = {
+                "encontro_al_usuario": String(r1),
+                "usuario_y_contraseña":String(r2),
+                "tipoUsuario":""
+            };
+
             if(r1 == "true" && r2 == "true"){
                 prom3.then((r3) => {
-                    respuesta.tipoUsuario = r3;
-                    
+                    respuesta.tipoUsuario = String(r3);
+                    console.log(respuesta);
                     res.send(respuesta);
                 });
             }else{

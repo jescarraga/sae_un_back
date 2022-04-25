@@ -34,6 +34,10 @@ indexRouter.route('/IngresoEstudiante')
     .post((req, res, next) => {
         var request = req.body;
 
+        if(request.id_tipo_usuario == 1){
+
+        }
+
         prom1 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.usuario_un_p}';`
             ).then((result) => {
@@ -76,7 +80,8 @@ indexRouter.route('/IngresoEstudiante')
             if(r1 == "true" && r2 == "true"){
                 prom3.then((r3) => {
                     respuesta.tipoUsuario = r3;
-                    res.send(respuesta);
+                    res.send("recibido")
+                    //res.send(respuesta);
                 });
             }else{
                 res.send(respuesta);

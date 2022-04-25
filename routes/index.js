@@ -1,11 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const database = require('../database');
+const { jsonp } = require('express/lib/response');
 
 const indexRouter = express.Router();
 
 // the system is going to use JSON fromat
-indexRouter.use(bodyParser.json());
+indexRouter.use(bodyParser.text());
 
 const obje={
     saludo : "Error"
@@ -40,7 +41,9 @@ indexRouter.route('/auth')
     })
     .get(sendNull)
     .post((req, res, next) => {
-        var request = req.body;
+        var request = JSON.parse(req.body);
+        console.log(req.body);
+
 
         prom1 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.username}';`
@@ -51,7 +54,7 @@ indexRouter.route('/auth')
                     return "false";
                 }
             })
-        .catch(()=> {return null});
+        .catch(()=> {res.send(obje)});
         
         prom2 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like
@@ -65,7 +68,7 @@ indexRouter.route('/auth')
                 return "false";
             }
         })
-        .catch(()=> {return null});
+        .catch(()=> {res.send(obje)});
         
         prom3 = queryCreator(
             `SELECT id_tipo_usuario from 
@@ -74,7 +77,7 @@ indexRouter.route('/auth')
         ).then((result) => {
             return result.rows[0].id_tipo_usuario;
         })
-        .catch(()=> {return null});
+        .catch(()=> {res.send(obje)});
 
         Promise.all([prom1,prom2]).then(([r1,r2]) => {
             respuesta = {};

@@ -26,7 +26,6 @@ sendNull = (req, res, next) => {
     res.send(null);
 }
 
-
 docenteRouter.use(bodyParser.json());
 
 docenteRouter.route('/docente')
@@ -53,8 +52,7 @@ docenteRouter.route('/docente')
 
                     if(!result.command){
                         var envio = {status:"No es posible ingresar un usuario con esos datos: "+ result.detail};
-                        res.send(envio);
-                        return;
+                        return res.send(envio);
                     }
 
                     prom2 = quieryCreator(
@@ -95,7 +93,10 @@ docenteRouter.route('/docente')
             return res.send({status:"Se requiere un usuario tipo docente"});
         }
     })
-    .get(sendNull)
+    .get((req, res, next) => {
+        quieryCreator(`SELECT nombre_departamento FROM public.departamento;`)
+        .then((result) => {res.send(result.rows.map((r)=>{return r.nombre_departamento}));});
+    })
     .put(sendNull)
     .delete(sendNull);
 

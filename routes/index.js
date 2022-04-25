@@ -32,11 +32,7 @@ function queryCreator(theQuery){
 indexRouter.route('/auth')
     .all((req, res, next) => {
         res.statusCode = 200;
-        res.set({
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Credentials" : true 
-        });
+        res.setHeader('Content-Type', 'text/plain');
         next();
     })
     .get(sendNull)
@@ -77,26 +73,21 @@ indexRouter.route('/auth')
             (SELECT documento FROM usuario where usuario_un like '${request.username}') as resultado
             left join perfil on resultado.documento = perfil.documento;`
         ).then((result) => {
-            return result.rows[0].id_tipo_usuario;
+            if(result.rows[0].id_tipo_usuario ??= null){
+                return result.rows[0].id_tipo_usuario;
+            }else{
+                return "0";
+            }
         })
         .catch(()=> {res.send(obje)});
 
-        Promise.all([prom1,prom2]).then(([r1,r2]) => {
+        Promise.all([prom1,prom2, prom3]).then(([r1,r2,r3]) => {
             respuesta = {
                 "encontro_al_usuario": String(r1),
                 "usuario_y_contraseña":String(r2),
-                "tipoUsuario":""
+                "tipoUsuario":String(r3)
             };
-
-            if(r1 == "true" && r2 == "true"){
-                prom3.then((r3) => {
-                    respuesta.tipoUsuario = String(r3);
-                    console.log(respuesta);
-                    res.send(respuesta);
-                });
-            }else{
-                res.send(respuesta);
-            }
+            res.json(respuesta);
         })
     }
     )

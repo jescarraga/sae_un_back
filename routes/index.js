@@ -7,7 +7,7 @@ const database = require('../database');
 const indexRouter = express.Router();
 
 // the system is going to use text fromat
-indexRouter.use(bodyParser.text());
+indexRouter.use(bodyParser.json());
 
 
 
@@ -37,15 +37,13 @@ indexRouter.route('/auth')
         res.send({"mensaje":"Hola"});
     })
     .post((req, res, next) => {
-        console.log(req)
-        console.log(req.body);
         var request = req.body;
+
 
         prom1 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.username}';`
             ).then((result) => {
                 
-                console.log("1");
                 if(result.rows[0].count == 1){
                     return "true";
                 }else{
@@ -61,7 +59,6 @@ indexRouter.route('/auth')
                 '${request.password}';`
         ).then((result) => {
 
-            console.log("2");
             if(result.rows[0].count == 1){
                 return "true";
             }else{
@@ -75,22 +72,22 @@ indexRouter.route('/auth')
             (SELECT documento FROM usuario where usuario_un like '${request.username}') as resultado
             left join perfil on resultado.documento = perfil.documento;`
         ).then((result) => {
-            if(result.rows[0].id_tipo_usuario !== null){
-                console.log(req.body);
+            if(result.rowCount > 0){
                 return result.rows[0].id_tipo_usuario;
             }else{
-                return "0";
+                return 0;
             }
         })
         .catch(()=> {null});
 
         Promise.all([prom1,prom2, prom3]).then(([r1,r2,r3]) => {
+            
             respuesta = {
                 "encontro_al_usuario": String(r1),
                 "usuario_y_contraseña":String(r2),
-                "tipoUsuario":String(r3)
+                "tipoUsuario":r3
             };
-            console.log(respuesta);
+            
             return res.send(respuesta);
         })
     }

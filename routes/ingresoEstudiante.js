@@ -2,99 +2,103 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const database = require('../database');
 
-//const { jsonp } = require('express/lib/response');
-
-const indexRouter = express.Router();
-
-// the system is going to use JSON fromat
-indexRouter.use(bodyParser.text());
+const docenteRouter = express.Router();
 
 
+/*
+    Allows the creation of querys and responses with promise to handle it
+*/
+function quieryCreator(theQuery) {
+    return (
+        new Promise((resolve, reject) => {
+            database.query(theQuery, (err, res1) => {
+                if (err) resolve(err);
+                else resolve(res1);
+            });
+        })
+    );
+}
 
-//function that responses with a null value
-sendNull = (req, res, next) =>{
+/*
+    Prototype of function that responses with a NULL value
+*/
+sendNull = (req, res, next) => {
     res.send(null);
 }
 
-//query maker and handler
-function queryCreator(theQuery){
-    return(
-        new Promise((resolve, reject) =>{
-            database.query(theQuery,(err, res1)=>{
-                if (err) resolve(err);
-                else resolve(res1);
-            })
-        })
-    )
-}
 
-indexRouter.route('/auth')
+docenteRouter.use(bodyParser.json());
+
+docenteRouter.route('/docente')
     .all((req, res, next) => {
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
         next();
     })
-    .get(sendNull)
     .post((req, res, next) => {
-        var request = JSON.parse(req.body);
-        console.log(req.body);
+        var request = req.body;
 
-        prom1 = queryCreator(
-            `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.username}';`
-            ).then((result) => {
-                
-                console.log("1");
-                if(result.rows[0].count == 1){
-                    return "true";
-                }else{
-                    return "false";
-                }
-            })
-        .catch(()=> {null});
-        
-        prom2 = queryCreator(
-            `SELECT COUNT(1) FROM password WHERE usuario_un_p like
-                '${request.username}'
-                and password_usuario like 
-                '${request.password}';`
-        ).then((result) => {
+        if (request.id_tipo_usuario == 1) {
 
-            console.log("2");
-            if(result.rows[0].count == 1){
-                return "true";
-            }else{
-                return "false";
-            }
-        })
-        .catch(()=> {null});
-        
-        prom3 = queryCreator(
-            `SELECT id_tipo_usuario from 
-            (SELECT documento FROM usuario where usuario_un like '${request.username}') as resultado
-            left join perfil on resultado.documento = perfil.documento;`
-        ).then((result) => {
-            if(result.rows[0].id_tipo_usuario !== null){
-                console.log(req.body);
-                return result.rows[0].id_tipo_usuario;
-            }else{
-                return "0";
-            }
-        })
-        .catch(()=> {null});
+            quieryCreator(
+                `INSERT INTO public.usuario(documento, nombres, apellidos, usuario_un, estado, sexo) 
+                    VALUES (
+                        '${request.documento}', 
+                        '${request.nombres}', 
+                        '${request.apellidos}', 
+                        '${request.usuario_un}', 
+                        '${request.estado}', 
+                        '${request.sexo}');`
+            )
+                .then((result) => {
 
-        Promise.all([prom1,prom2, prom3]).then(([r1,r2,r3]) => {
-            respuesta = {
-                "encontro_al_usuario": String(r1),
-                "usuario_y_contraseña":String(r2),
-                "tipoUsuario":String(r3)
-            };
-            console.log(req.body);
-            return res.send(JSON.stringify(respuesta));
-        })
-    }
-    )
+                    if(!result.command){
+                        var envio = {status:"No es posible ingresar un usuario con esos datos: "+ result.detail};
+                        res.send(envio);
+                        return;
+                    }
+
+                    prom2 = quieryCreator(
+                        `INSERT INTO public.estado_semestre(documento, codigo, fecha_ingreso, cursando)
+                        values('${request.documento}','${request.codigo}','${request.fecha_ingreso}','${request.cursando}');`
+                    )
+                        .then((result) => {
+                            return result;
+                        })
+                        .catch((err) => {
+                            return "Error conexion BD Tabla docente: " + err;
+                        });
+
+                    prom3 = quieryCreator(
+                        `INSERT INTO public.perfil(id_tipo_usuario, documento) values('${request.id_tipo_usuario}','${request.documento}')`
+                    )
+                        .then((result) => {
+                            return result;
+                        })
+                        .catch((err) => {
+                            return "Error conexion BD Tabla docente: " + err;
+                        });
+
+
+                    Promise.all([prom2, prom3]).then(([r1, r2]) => {
+                        if (r1.command && r2.command && result.command) {
+                            return res.send({status: true});
+                        } else {
+                            var resp = {status: r1 + "\n" + r2 + "\n" + result};
+                            return res.send(resp);
+                        }
+
+                    });
+                })
+                .catch((err) => {
+                    return res.send({status:"Error conexion BD Tabla usuarios: " + err});
+                });
+        } else {
+            return res.send({status:"Se requiere un usuario tipo docente"});
+        }
+    })
+    .get(sendNull)
     .put(sendNull)
     .delete(sendNull);
 
 
-module.exports = indexRouter;
+module.exports = docenteRouter;

@@ -1,20 +1,19 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const database = require('../database');
-const { jsonp } = require('express/lib/response');
+
+//const { jsonp } = require('express/lib/response');
 
 const indexRouter = express.Router();
 
 // the system is going to use JSON fromat
 indexRouter.use(bodyParser.text());
 
-const obje={
-    saludo : "Error"
-}
+
 
 //function that responses with a null value
 sendNull = (req, res, next) =>{
-    res.send(obje);
+    res.send(null);
 }
 
 //query maker and handler
@@ -32,7 +31,6 @@ function queryCreator(theQuery){
 indexRouter.route('/auth')
     .all((req, res, next) => {
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
         next();
     })
     .get(sendNull)
@@ -40,18 +38,18 @@ indexRouter.route('/auth')
         var request = JSON.parse(req.body);
         console.log(req.body);
 
-
         prom1 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.username}';`
             ).then((result) => {
                 
+                console.log("1");
                 if(result.rows[0].count == 1){
                     return "true";
                 }else{
                     return "false";
                 }
             })
-        .catch(()=> {res.send(obje)});
+        .catch(()=> {null});
         
         prom2 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like
@@ -59,27 +57,29 @@ indexRouter.route('/auth')
                 and password_usuario like 
                 '${request.password}';`
         ).then((result) => {
-            
+
+            console.log("2");
             if(result.rows[0].count == 1){
                 return "true";
             }else{
                 return "false";
             }
         })
-        .catch(()=> {res.send(obje)});
+        .catch(()=> {null});
         
         prom3 = queryCreator(
             `SELECT id_tipo_usuario from 
             (SELECT documento FROM usuario where usuario_un like '${request.username}') as resultado
             left join perfil on resultado.documento = perfil.documento;`
         ).then((result) => {
-            if(result.rows[0].id_tipo_usuario ??= null){
+            if(result.rows[0].id_tipo_usuario !== null){
+                console.log(req.body);
                 return result.rows[0].id_tipo_usuario;
             }else{
                 return "0";
             }
         })
-        .catch(()=> {res.send(obje)});
+        .catch(()=> {null});
 
         Promise.all([prom1,prom2, prom3]).then(([r1,r2,r3]) => {
             respuesta = {
@@ -87,7 +87,8 @@ indexRouter.route('/auth')
                 "usuario_y_contraseña":String(r2),
                 "tipoUsuario":String(r3)
             };
-            res.json(respuesta);
+            console.log(req.body);
+            return res.send(JSON.stringify(respuesta));
         })
     }
     )

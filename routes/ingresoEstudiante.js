@@ -2,10 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const database = require('../database');
 
+//const { jsonp } = require('express/lib/response');
+
 const indexRouter = express.Router();
 
 // the system is going to use JSON fromat
-indexRouter.use(bodyParser.json());
+indexRouter.use(bodyParser.text());
+
+
 
 //function that responses with a null value
 sendNull = (req, res, next) =>{
@@ -24,7 +28,7 @@ function queryCreator(theQuery){
     )
 }
 
-indexRouter.route('/IngresoEstudiante')
+indexRouter.route('/auth')
     .all((req, res, next) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'text/plain');
@@ -32,60 +36,60 @@ indexRouter.route('/IngresoEstudiante')
     })
     .get(sendNull)
     .post((req, res, next) => {
-        var request = req.body;
-
-        if(request.id_tipo_usuario == 1){
-
-        }
+        var request = JSON.parse(req.body);
+        console.log(req.body);
 
         prom1 = queryCreator(
-            `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.usuario_un_p}';`
+            `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.username}';`
             ).then((result) => {
+                
+                console.log("1");
                 if(result.rows[0].count == 1){
                     return "true";
                 }else{
                     return "false";
                 }
             })
-        .catch(()=> {return null});
+        .catch(()=> {null});
         
         prom2 = queryCreator(
             `SELECT COUNT(1) FROM password WHERE usuario_un_p like
-                '${request.usuario_un_p}'
+                '${request.username}'
                 and password_usuario like 
-                '${request.password_usuario}';`
+                '${request.password}';`
         ).then((result) => {
+
+            console.log("2");
             if(result.rows[0].count == 1){
                 return "true";
             }else{
                 return "false";
             }
         })
-        .catch(()=> {return null});
+        .catch(()=> {null});
         
         prom3 = queryCreator(
             `SELECT id_tipo_usuario from 
-            (SELECT documento FROM usuario where usuario_un like '${request.usuario_un_p}') as resultado
+            (SELECT documento FROM usuario where usuario_un like '${request.username}') as resultado
             left join perfil on resultado.documento = perfil.documento;`
         ).then((result) => {
-            return result.rows[0].id_tipo_usuario;
-        })
-        .catch(()=> {return null});
-
-        Promise.all([prom1,prom2]).then(([r1,r2]) => {
-            respuesta = {};
-            respuesta.encontro_al_usuario = r1;
-            respuesta.usuario_y_contraseña = r2;
-            
-            if(r1 == "true" && r2 == "true"){
-                prom3.then((r3) => {
-                    respuesta.tipoUsuario = r3;
-                    res.send("recibido")
-                    //res.send(respuesta);
-                });
+            if(result.rows[0].id_tipo_usuario !== null){
+                console.log(req.body);
+                return result.rows[0].id_tipo_usuario;
             }else{
-                res.send(respuesta);
+                return "0";
             }
+        })
+        .catch(()=> {null});
+
+        Promise.all([prom1,prom2, prom3]).then(([r1,r2,r3]) => {
+            respuesta = {
+                "encontro_al_usuario": String(r1),
+                "usuario_y_contraseña":String(r2),
+                "tipoUsuario":String(r3)
+            };
+            console.log(req.body);
+            return res.send(JSON.stringify(respuesta));
         })
     }
     )

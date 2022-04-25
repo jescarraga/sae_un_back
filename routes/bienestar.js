@@ -6,12 +6,12 @@ const axios = require('axios');
 
 const indexRouter = express.Router();
 
-indexRouter.use(bodyParser.text());
+indexRouter.use(bodyParser.json());
 
 indexRouter.route('/bienestar')
     .all((req, res, next) => {
         res.statusCode = 200;
-        //res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Type', 'application/json');
         next();
     })
     .get((req, res, next) => {
@@ -41,13 +41,13 @@ indexRouter.route('/bienestar')
             );
         }
 
-        data(documento).then((datas) => { res.end(JSON.stringify(datas)) });
+        data(documento).then((datas) => { res.json(datas) });
 
         
     })
     .post((req, res, next) => {
 
-        var toInsert = JSON.parse(req.body);
+        var toInsert = req.body;
         console.log(toInsert);
         const data = (toInsert) => {
             return (
@@ -80,7 +80,7 @@ indexRouter.route('/bienestar')
         }
 
         data(toInsert)
-            .then((datas) => { res.send(JSON.stringify(datas)) })
+            .then((datas) => { res.json(datas) })
             .catch((err) => {res.end("no funciona, error: " + err); res.status(500)}); 
             
     })

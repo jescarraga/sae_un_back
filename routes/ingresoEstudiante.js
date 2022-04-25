@@ -2,7 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const database = require('../database');
 
-const docenteRouter = express.Router();
+//const { jsonp } = require('express/lib/response');
+
+const ingresoEstudianteRouter = express.Router();
+
+// the system is going to use text fromat
+ingresoEstudianteRouter.use(bodyParser.json());
 
 
 /*
@@ -27,15 +32,16 @@ sendNull = (req, res, next) => {
 }
 
 
-docenteRouter.use(bodyParser.json());
+ingresoEstudianteRouter.use(bodyParser.json());
 
-docenteRouter.route('/docente')
+ingresoEstudianteRouter.route('/ingresoEstudiante')
     .all((req, res, next) => {
         res.statusCode = 200;
         next();
     })
     .post((req, res, next) => {
         var request = req.body;
+        console.log(req.body);
 
         if (request.id_tipo_usuario == 1) {
 
@@ -126,4 +132,4 @@ docenteRouter.route('/docente')
     .delete(sendNull);
 
 
-module.exports = docenteRouter;
+module.exports = ingresoEstudianteRouter;

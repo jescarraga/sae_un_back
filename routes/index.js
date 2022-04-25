@@ -45,9 +45,9 @@ indexRouter.route('/auth')
             ).then((result) => {
                 
                 if(result.rows[0].count == 1){
-                    return "true";
+                    return true;
                 }else{
-                    return "false";
+                    return false;
                 }
             })
         .catch(()=> {null});
@@ -60,9 +60,9 @@ indexRouter.route('/auth')
         ).then((result) => {
 
             if(result.rows[0].count == 1){
-                return "true";
+                return true;
             }else{
-                return "false";
+                return false;
             }
         })
         .catch(()=> {null});
@@ -83,10 +83,15 @@ indexRouter.route('/auth')
         Promise.all([prom1,prom2, prom3]).then(([r1,r2,r3]) => {
             
             respuesta = {
-                "encontro_al_usuario": String(r1),
-                "usuario_y_contraseña":String(r2),
-                "tipoUsuario":r3
+                "encontro_al_usuario": r1,
+                "usuario_y_contraseña":r2,
+                "tipoUsuario":r3,
+                "status":false
             };
+
+            if(r1 == true && r2 == true) {
+                respuesta.status = true
+            }
             
             return res.send(respuesta);
         })

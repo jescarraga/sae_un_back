@@ -57,8 +57,21 @@ docenteRouter.route('/docente')
                         return;
                     }
 
+                    
+
                     prom2 = quieryCreator(
                         `INSERT INTO public.estado_semestre(documento, codigo, fecha_ingreso, cursando)
+                        values('${request.documento}','${request.codigo}','${request.fecha_ingreso}','${request.cursando}');`
+                    )
+                        .then((result) => {
+                            return result;
+                        })
+                        .catch((err) => {
+                            return "Error conexion BD Tabla docente: " + err;
+                        });
+
+                    prom2 = quieryCreator(
+                        `INSERT INTO public.datos(documento, codigo, fecha_ingreso, cursando)
                         values('${request.documento}','${request.codigo}','${request.fecha_ingreso}','${request.cursando}');`
                     )
                         .then((result) => {

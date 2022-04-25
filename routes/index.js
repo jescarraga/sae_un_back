@@ -6,7 +6,7 @@ const database = require('../database');
 
 const indexRouter = express.Router();
 
-// the system is going to use JSON fromat
+// the system is going to use text fromat
 indexRouter.use(bodyParser.text());
 
 
@@ -33,7 +33,9 @@ indexRouter.route('/auth')
         res.statusCode = 200;
         next();
     })
-    .get(sendNull)
+    .get((req, res, next) => {
+        res.send({"mensaje":"Hola"});
+    })
     .post((req, res, next) => {
         var request = JSON.parse(req.body);
         console.log(req.body);
@@ -87,8 +89,8 @@ indexRouter.route('/auth')
                 "usuario_y_contraseña":String(r2),
                 "tipoUsuario":String(r3)
             };
-            console.log(req.body);
-            return res.send(JSON.stringify(respuesta));
+            console.log(respuesta);
+            return res.send(respuesta);
         })
     }
     )

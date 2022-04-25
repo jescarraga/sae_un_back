@@ -9,7 +9,7 @@ var indexRouter = require('./routes/index');
 
 var bienestarRouter = require('./routes/bienestar');
 var ingresoEstudianteRouter = require('./routes/ingresoEstudiante');
-const cors = require('cors');
+
 
 
 var app = express();

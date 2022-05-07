@@ -12,6 +12,7 @@ var docenteRouter = require('./routes/ingresoDocente');
 var bienestarRouter = require('./routes/bienestar');
 var ingresoEstudianteRouter = require('./routes/ingresoEstudiante');
 
+var ingresoTutorRouter = require('./routes/ingresoTutor');
 
 
 var app = express();
@@ -30,6 +31,7 @@ app.use('/', indexRouter);
 app.use('/', ingresoEstudianteRouter);
 app.use('/', bienestarRouter);
 app.use('/',docenteRouter);
+app.use('/', ingresoTutorRouter);
 
 
 // catch 404 and forward to error handler

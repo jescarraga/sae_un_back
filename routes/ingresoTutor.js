@@ -72,8 +72,7 @@ ingresoTutorRouter.route('/ingresoTutor')
 
         promDuplicado = queryCreator(
             `SELECT COUNT(1) FROM tutores WHERE documento_docente = '${request.documentoDocente}' 
-            and documento_estudiante = '${request.documentoEstudiante}' 
-            and codigo_plan = '${request.codigoPlan}';`
+            and documento_estudiante = '${request.documentoEstudiante}';`
 
         ).then((result) => {
 
@@ -83,10 +82,21 @@ ingresoTutorRouter.route('/ingresoTutor')
                 return false;
             }
         })
+        promInsert = queryCreator(
+            `INSERT INTO tutores (documento_docente,
+            documento_estudiante,
+            codigo_plan) VALUES (
+            '${request.documentoDocente}',
+            '${request.documentoEstudiante}',
+            ${request.codigoPlan}
+            )`
+        ).then((result) => {
+            return(result);
+        })
             .catch(() => { null });
 
         Promise.all([promEstudiante, promDocente, promDuplicado]).then(([estudiante, docente, duplicado]) => {
-            console.log(estudiante, docente);
+            //console.log(estudiante, docente);
             res.statusCode = 404;
             if (!estudiante && !docente) {
                 res.json({
@@ -103,14 +113,21 @@ ingresoTutorRouter.route('/ingresoTutor')
             } else if (duplicado) {
                 res.statusCode = 400;
                 res.json({
-                    "message": "El docente ingresado ya es tutor del estudiante ingresado para el plan seleccionado"
+                    "message": "El docente ya es tutor del estudiante"
                 });
+            } else {
+
+                promInsert.then((inserted) => {
+                    res.statusCode = 200;
+                    res.send(request);
+                    console.log(inserted)
+                })
             }
         })
 
     }
     )
-    .get(sendNull)
+
     .put(sendNull)
     .delete(sendNull);
 

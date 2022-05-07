@@ -40,7 +40,60 @@ ingresoTutorRouter.route('/ingresoTutor')
         next();
     })
     .get((req, res, next) => {
-        res.send("holi");
+        docente = req.query.documentoDocente;
+        estudiante = req.query.documentoEstudiante;
+        if (Object.keys(req.query).length === 0) {
+            consultaTotal = queryCreator(
+                `SELECT * FROM tutores;`
+
+            ).then((result) => {
+
+                return (result.rows); 
+                
+            })
+            consultaTotal.then((rows) => {
+                res.json(rows);
+            })
+        } else if (!docente){
+            consultaEstudiante = queryCreator(
+                `SELECT * FROM tutores WHERE documento_estudiante = '${estudiante}' ;`
+
+            ).then((result) => {
+                console.log(result)
+                return (result.rows); 
+                
+            })
+            consultaEstudiante.then((rows) => {
+                res.json(rows);
+            })
+        } else if (!estudiante){
+            consultaDocente = queryCreator(
+                `SELECT * FROM tutores WHERE documento_docente = '${docente}' ;`
+
+            ).then((result) => {
+               
+                return (result.rows); 
+                
+            })
+            consultaDocente.then((rows) => {
+          
+                res.json(rows);
+            })
+        } else if (estudiante && docente){
+            consultaAmbas = queryCreator(
+                `SELECT * FROM tutores WHERE documento_docente = '${docente}' AND documento_estudiante = '${estudiante}' ;`
+
+            ).then((result) => {
+
+                return (result.rows); 
+                
+            })
+            consultaAmbas.then((rows) => {
+                res.json(rows);
+            })
+        } else {
+            res.json({message:"Invalid parameters"})
+        }
     })
     .post((req, res, next) => {
         var request = req.body;
@@ -83,7 +136,7 @@ ingresoTutorRouter.route('/ingresoTutor')
             }
         })
         promInsert = queryCreator(
-            `INSERT INTO tutores (documento_docente,
+            `INSERT INTO public.tutores (documento_docente,
             documento_estudiante,
             codigo_plan) VALUES (
             '${request.documentoDocente}',
@@ -91,7 +144,7 @@ ingresoTutorRouter.route('/ingresoTutor')
             ${request.codigoPlan}
             )`
         ).then((result) => {
-            return(result);
+            return (result);
         })
             .catch(() => { null });
 

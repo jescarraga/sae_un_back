@@ -55,7 +55,7 @@ docenteRouter.route('/docente')
                                 return result;
                             })
                             .catch((err) => {
-                                return "Error conexion BD Tabla docente: " + err;
+                                return "Error conexion BD Tabla perfil: " + err;
                             });
 
 

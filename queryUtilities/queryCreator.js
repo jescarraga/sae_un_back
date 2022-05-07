@@ -1,4 +1,4 @@
-const database = require('../database');
+const database = require('./database');
 
 //query maker and handler
 function queryCreator(theQuery){

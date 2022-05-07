@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const database = require('../database');
+const database = require('../queryUtilities/database');
 const axios = require('axios');
 
 

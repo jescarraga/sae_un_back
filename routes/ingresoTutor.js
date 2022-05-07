@@ -1,37 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const database = require('../database');
+const queryCreator = require('../queryUtilities/queryCreator');
+const sendNull = require('../queryUtilities/queryNull');
 
 //const { jsonp } = require('express/lib/response');
 
 const ingresoTutorRouter = express.Router();
 
 // the system is going to use text fromat
-ingresoTutorRouter.use(bodyParser.json());
-
-
-/*
-    Allows the creation of querys and responses with promise to handle it
-*/
-function queryCreator(theQuery) {
-    return (
-        new Promise((resolve, reject) => {
-            database.query(theQuery, (err, res1) => {
-                if (err) resolve(err);
-                else resolve(res1);
-            });
-        })
-    );
-}
-
-/*
-    Prototype of function that responses with a NULL value
-*/
-sendNull = (req, res, next) => {
-    res.send(null);
-}
-
-
 ingresoTutorRouter.use(bodyParser.json());
 
 ingresoTutorRouter.route('/ingresoTutor')

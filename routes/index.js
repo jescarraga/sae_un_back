@@ -1,32 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const database = require('../database');
+const queryCreator = require('../queryUtilities/queryCreator');
+const sendNull = require('../queryUtilities/queryNull');
+
 
 //const { jsonp } = require('express/lib/response');
-
 const indexRouter = express.Router();
 
 // the system is going to use text fromat
 indexRouter.use(bodyParser.json());
 
-
-
-//function that responses with a null value
-sendNull = (req, res, next) =>{
-    res.send(null);
-}
-
-//query maker and handler
-function queryCreator(theQuery){
-    return(
-        new Promise((resolve, reject) =>{
-            database.query(theQuery,(err, res1)=>{
-                if (err) resolve(err);
-                else resolve(res1);
-            })
-        })
-    )
-}
 
 indexRouter.route('/auth')
     .all((req, res, next) => {

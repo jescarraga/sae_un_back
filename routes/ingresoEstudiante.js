@@ -1,37 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const database = require('../database');
+const queryCreator = require('../queryUtilities/queryCreator');
+const sendNull = require('../queryUtilities/queryNull');
 
 //const { jsonp } = require('express/lib/response');
 
 const ingresoEstudianteRouter = express.Router();
 
 // the system is going to use text fromat
-ingresoEstudianteRouter.use(bodyParser.json());
-
-
-/*
-    Allows the creation of querys and responses with promise to handle it
-*/
-function quieryCreator(theQuery) {
-    return (
-        new Promise((resolve, reject) => {
-            database.query(theQuery, (err, res1) => {
-                if (err) resolve(err);
-                else resolve(res1);
-            });
-        })
-    );
-}
-
-/*
-    Prototype of function that responses with a NULL value
-*/
-sendNull = (req, res, next) => {
-    res.send(null);
-}
-
-
 ingresoEstudianteRouter.use(bodyParser.json());
 
 ingresoEstudianteRouter.route('/ingresoEstudiante')
@@ -45,7 +21,7 @@ ingresoEstudianteRouter.route('/ingresoEstudiante')
 
         if (request.id_tipo_usuario == 1) {
 
-            quieryCreator(
+            queryCreator(
                 `INSERT INTO public.usuario(documento, nombres, apellidos, usuario_un, estado, sexo) 
                     VALUES (
                         '${request.documento}', 
@@ -65,7 +41,7 @@ ingresoEstudianteRouter.route('/ingresoEstudiante')
 
                     
 
-                    prom2 = quieryCreator(
+                    prom2 = queryCreator(
                         `INSERT INTO public.estado_semestre(documento, codigo, fecha_ingreso, cursando)
                         values('${request.documento}','${request.codigo}','${request.fecha_ingreso}','${request.cursando}');`
                     )
@@ -76,7 +52,7 @@ ingresoEstudianteRouter.route('/ingresoEstudiante')
                             return "Error conexion BD Tabla estado semestre: " + err;
                         });
 
-                    prom3 = quieryCreator(
+                    prom3 = queryCreator(
                         `INSERT INTO public.datos(documento, documento_nacional)
                         values('${request.documento}','${request.documento_nacional}');`
                     )
@@ -87,7 +63,7 @@ ingresoEstudianteRouter.route('/ingresoEstudiante')
                             return "Error conexion BD Tabla datos: " + err;
                         });
                     
-                    prom4 = quieryCreator(
+                    prom4 = queryCreator(
                         `INSERT INTO public.informacion_academica(documento)
                         values('${request.documento}');`
                     )
@@ -98,7 +74,7 @@ ingresoEstudianteRouter.route('/ingresoEstudiante')
                             return "Error conexion BD Tabla informacion academica: " + err;
                         });    
 
-                    prom5 = quieryCreator(
+                    prom5 = queryCreator(
                         `INSERT INTO public.perfil(id_tipo_usuario, documento) 
                         values('${request.id_tipo_usuario}','${request.documento}')`
                     )

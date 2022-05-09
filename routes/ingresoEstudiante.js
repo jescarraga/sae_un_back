@@ -9,6 +9,7 @@ const ingresoEstudianteRouter = express.Router();
 
 // the system is going to use text fromat
 ingresoEstudianteRouter.use(bodyParser.json());
+var getQuery = `SELECT codigo, nombre_programa_curricular FROM public.programas_curriculares;`;
 
 ingresoEstudianteRouter.route('/ingresoEstudiante')
     .all((req, res, next) => {
@@ -103,7 +104,10 @@ ingresoEstudianteRouter.route('/ingresoEstudiante')
             return res.send({status:"Se requiere un usuario tipo estudiante"});
         }
     })
-    .get(sendNull)
+    .get(async (req, res, next) => {
+        var resultquery = await queryCreator(getQuery);
+        res.send(resultquery.rows.map((r) => { return [r.codigo, r.nombre_programa_curricular] }));
+    })
     .put(sendNull)
     .delete(sendNull);
 

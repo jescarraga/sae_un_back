@@ -8,7 +8,7 @@ const docenteRouter = express.Router();
 docenteRouter.use(bodyParser.json());
 var getQuery = `SELECT id_departamento, nombre_departamento FROM public.departamento;`;
 
-docenteRouter.route('/docente')
+docenteRouter.route('/ingresoDocente')
     .all((req, res, next) => {
         res.statusCode = 200;
         next();

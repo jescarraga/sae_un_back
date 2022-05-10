@@ -56,7 +56,7 @@ ingresoTutorRouter.route('/ingresoTutor')
             })
         } else if (!docente) {
             consultaEstudiante = queryCreator(
-                `SELECT * FROM tutores WHERE documento_estudiante = '${estudiante}' ;`
+                `SELECT * FROM tutores WHERE documento_estudiante = '${estudiante}' and documento_estudiante in (select documento from estado_semestre where documento = '${estudiante}' and cursando = true) ;`
 
             ).then((result) => {
                 console.log(result)
@@ -68,7 +68,7 @@ ingresoTutorRouter.route('/ingresoTutor')
             })
         } else if (!estudiante) {
             consultaDocente = queryCreator(
-                `SELECT * FROM tutores WHERE documento_docente = '${docente}' ;`
+                `SELECT * FROM tutores WHERE documento_docente = '${docente}' and documento_estudiante in (select documento from estado_semestre where  cursando = true) ;`
 
             ).then((result) => {
 
@@ -81,7 +81,7 @@ ingresoTutorRouter.route('/ingresoTutor')
             })
         } else if (estudiante && docente) {
             consultaAmbas = queryCreator(
-                `SELECT * FROM tutores WHERE documento_docente = '${docente}' AND documento_estudiante = '${estudiante}' ;`
+                `SELECT * FROM tutores WHERE documento_docente = '${docente}' AND documento_estudiante = '${estudiante}' and documento_estudiante in (select documento from estado_semestre where  cursando = true);`
 
             ).then((result) => {
 
@@ -100,7 +100,7 @@ ingresoTutorRouter.route('/ingresoTutor')
 
 
         promEstudiante = queryCreator(
-            `select count(1) from estado_semestre where documento =  '${request.documentoEstudiante}'  ;`
+            `select count(1) from estado_semestre where documento =  '${request.documentoEstudiante}'  and documento in (select documento from estado_semestre where documento = '${request.documentoEstudiante}' and cursando = true);`
         ).then((result) => {
             if (result.rows[0].count != 0) {
                 return true;
@@ -171,7 +171,7 @@ ingresoTutorRouter.route('/ingresoTutor')
                 });
             } else if (!estudiante) {
                 res.json({
-                    "message": "Estudiante inexistente"
+                    "message": "Estudiante inexistente o inactivo"
                 });
             } else if (!docente) {
                 res.json({

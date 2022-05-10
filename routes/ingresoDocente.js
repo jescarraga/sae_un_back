@@ -41,8 +41,6 @@ async function docenteR(req, res, next) {
                             ${request.id_tipo_usuario});`
         );
 
-        console.log(insertUsuario);
-
         if (!insertUsuario.command) {
             var envio = { status: "No es posible ingresar un usuario con esos datos: " + insertUsuario};
             return res.send(envio);

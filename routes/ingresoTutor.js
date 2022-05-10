@@ -44,7 +44,7 @@ ingresoTutorRouter.route('/ingresoTutor')
         estudiante = req.query.documentoEstudiante;
         if (Object.keys(req.query).length === 0) {
             consultaTotal = queryCreator(
-                `SELECT * FROM tutores;`
+                `SELECT * FROM tutores WHERE documento_estudiante in (select documento from estado_semestre where cursando = true);`
 
             ).then((result) => {
 
@@ -56,8 +56,9 @@ ingresoTutorRouter.route('/ingresoTutor')
             })
         } else if (!docente) {
             consultaEstudiante = queryCreator(
-                `SELECT * FROM tutores WHERE documento_estudiante = '${estudiante}' and documento_estudiante in (select documento from estado_semestre where documento = '${estudiante}' and cursando = true) ;`
-
+                `select t.documento_docente , t.documento_estudiante , t.codigo_plan , u.nombres , u.apellidos , u.usuario_un
+                from tutores t inner join usuario u on t.documento_docente =u.documento
+                WHERE documento_estudiante = '${estudiante}' `
             ).then((result) => {
                 console.log(result)
                 return (result.rows);
@@ -68,7 +69,9 @@ ingresoTutorRouter.route('/ingresoTutor')
             })
         } else if (!estudiante) {
             consultaDocente = queryCreator(
-                `SELECT * FROM tutores WHERE documento_docente = '${docente}' and documento_estudiante in (select documento from estado_semestre where  cursando = true) ;`
+                `select t.documento_docente , t.documento_estudiante , t.codigo_plan , u.nombres , u.apellidos , u.usuario_un
+                from tutores t inner join usuario u on t.documento_estudiante =u.documento
+                WHERE documento_estudiante in (select documento from estado_semestre where cursando = true) AND documento_docente = '${docente}' ;`
 
             ).then((result) => {
 

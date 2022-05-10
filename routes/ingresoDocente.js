@@ -35,11 +35,13 @@ async function docenteR(req, res, next) {
                             '${request.nombres}', 
                             '${request.apellidos}', 
                             '${request.usuario_un}', 
-                            ${request.estado ? true : false}, 
-                            ${request.sexo ? true : false},
+                            ${request.estado == 1 ? true : false}, 
+                            ${request.sexo == 1 ? true : false},
                             ${request.id_departamento}, 
                             ${request.id_tipo_usuario});`
         );
+
+        console.log(insertUsuario);
 
         if (!insertUsuario.command) {
             var envio = { status: "No es posible ingresar un usuario con esos datos: " + insertUsuario};

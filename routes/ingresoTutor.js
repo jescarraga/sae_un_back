@@ -48,51 +48,51 @@ ingresoTutorRouter.route('/ingresoTutor')
 
             ).then((result) => {
 
-                return (result.rows); 
-                
+                return (result.rows);
+
             })
             consultaTotal.then((rows) => {
                 res.json(rows);
             })
-        } else if (!docente){
+        } else if (!docente) {
             consultaEstudiante = queryCreator(
                 `SELECT * FROM tutores WHERE documento_estudiante = '${estudiante}' ;`
 
             ).then((result) => {
                 console.log(result)
-                return (result.rows); 
-                
+                return (result.rows);
+
             })
             consultaEstudiante.then((rows) => {
                 res.json(rows);
             })
-        } else if (!estudiante){
+        } else if (!estudiante) {
             consultaDocente = queryCreator(
                 `SELECT * FROM tutores WHERE documento_docente = '${docente}' ;`
 
             ).then((result) => {
-               
-                return (result.rows); 
-                
+
+                return (result.rows);
+
             })
             consultaDocente.then((rows) => {
-          
+
                 res.json(rows);
             })
-        } else if (estudiante && docente){
+        } else if (estudiante && docente) {
             consultaAmbas = queryCreator(
                 `SELECT * FROM tutores WHERE documento_docente = '${docente}' AND documento_estudiante = '${estudiante}' ;`
 
             ).then((result) => {
 
-                return (result.rows); 
-                
+                return (result.rows);
+
             })
             consultaAmbas.then((rows) => {
                 res.json(rows);
             })
         } else {
-            res.json({message:"Invalid parameters"})
+            res.json({ message: "Invalid parameters" })
         }
     })
     .post((req, res, next) => {
@@ -100,9 +100,9 @@ ingresoTutorRouter.route('/ingresoTutor')
 
 
         promEstudiante = queryCreator(
-            `SELECT COUNT(1) FROM perfil WHERE documento = '${request.documentoEstudiante}' and id_tipo_usuario = 1 ;`
+            `select count(1) from estado_semestre where documento =  '${request.documentoEstudiante}'  ;`
         ).then((result) => {
-            if (result.rows[0].count == 1) {
+            if (result.rows[0].count != 0) {
                 return true;
             } else {
                 return false;
@@ -111,7 +111,21 @@ ingresoTutorRouter.route('/ingresoTutor')
             .catch(() => { null });
 
         promDocente = queryCreator(
-            `SELECT COUNT(1) FROM perfil WHERE documento = '${request.documentoDocente}' and id_tipo_usuario = 2 ;`
+            `SELECT COUNT(1) FROM docente WHERE documento = '${request.documentoDocente}' ;`
+
+        ).then((result) => {
+
+            if (result.rows[0].count == 1) {
+                return true;
+            } else {
+                return false;
+            }
+        })
+            .catch(() => { null });
+
+
+        promPlan = queryCreator(
+            `SELECT COUNT(1) FROM programas_curriculares WHERE codigo = '${request.codigoPlan}' ;`
 
         ).then((result) => {
 
@@ -124,12 +138,12 @@ ingresoTutorRouter.route('/ingresoTutor')
             .catch(() => { null });
 
         promDuplicado = queryCreator(
-            `SELECT COUNT(1) FROM tutores WHERE documento_docente = '${request.documentoDocente}' 
+            `SELECT COUNT(1) FROM tutores WHERE codigo_plan = '${request.codigoPlan}' 
             and documento_estudiante = '${request.documentoEstudiante}';`
 
         ).then((result) => {
 
-            if (result.rows[0].count == 1) {
+            if (result.rows[0].count != 0) {
                 return true;
             } else {
                 return false;
@@ -148,7 +162,7 @@ ingresoTutorRouter.route('/ingresoTutor')
         })
             .catch(() => { null });
 
-        Promise.all([promEstudiante, promDocente, promDuplicado]).then(([estudiante, docente, duplicado]) => {
+        Promise.all([promEstudiante, promDocente, promPlan, promDuplicado]).then(([estudiante, docente, plan, duplicado]) => {
             //console.log(estudiante, docente);
             res.statusCode = 404;
             if (!estudiante && !docente) {
@@ -163,10 +177,14 @@ ingresoTutorRouter.route('/ingresoTutor')
                 res.json({
                     "message": "Docente inexistente"
                 });
+            } else if (!plan) {
+                res.json({
+                    "message": "Código de programa inexistente"
+                });
             } else if (duplicado) {
                 res.statusCode = 400;
                 res.json({
-                    "message": "El docente ya es tutor del estudiante"
+                    "message": "El estudiante ya tiene un tutor asignado para el programa especificado"
                 });
             } else {
 

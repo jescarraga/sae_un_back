@@ -123,4 +123,17 @@ indexRouter.route('/bienestar/docentes')
         })
     })
 
+    indexRouter.route('/bienestar/planes')
+    .get((req, res, next) => {
+        estudiante = req.query.documentoEstudiante;
+        queryPlanes = queryCreator(
+            `SELECT * FROM public.estado_semestre WHERE documento = '${estudiante}'`
+        ).then((result) => {
+            return (result.rows);
+        })
+        queryPlanes.then((rows) => {
+            res.json(rows);
+        })
+    })
+
 module.exports = indexRouter;

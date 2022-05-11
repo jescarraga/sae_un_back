@@ -1,5 +1,5 @@
 const { Client, Pool } = require('pg')
-//v
+
 const client = {
     user: 'uwwxvblzcigqja',
     host: 'ec2-23-20-224-166.compute-1.amazonaws.com',
@@ -12,5 +12,4 @@ const client = {
 };
 
 const pool = new Pool(client);
-
 module.exports = pool;

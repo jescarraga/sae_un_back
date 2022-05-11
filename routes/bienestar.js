@@ -1,14 +1,28 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const database = require('../database');
+const database = require('../queryUtilities/database');
 const axios = require('axios');
-
+const sendNull = require('../queryUtilities/queryNull');
 
 const indexRouter = express.Router();
 
+/*
+    Allows the creation of querys and responses with promise to handle it
+*/
+function queryCreator(theQuery) {
+    return (
+        new Promise((resolve, reject) => {
+            database.query(theQuery, (err, res1) => {
+                if (err) resolve(err);
+                else resolve(res1);
+            });
+        })
+    );
+}
+
 indexRouter.use(bodyParser.json());
 
-indexRouter.route('/bienestar')
+indexRouter.route('/ingresoBienestar')
     .all((req, res, next) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
@@ -53,7 +67,7 @@ indexRouter.route('/bienestar')
 
             return (
                 new Promise((resolve, reject) => {
-                    
+
                     database.query(`INSERT INTO public.usuario(
                         documento, nombres, apellidos, usuario_un, estado, sexo)
                         VALUES ('${toInsert.documento}', '${toInsert.nombres}', '${toInsert.apellidos}', '${toInsert.usuario_un}', '${toInsert.estado}', '${toInsert.sexo}');
@@ -96,5 +110,36 @@ indexRouter.route('/bienestar')
         res.end('will delete something' + req.body.name + '  ' + req.body.description);
     });
 
+indexRouter.route('/bienestar/docentes')
+    .get((req, res, next) => {
+
+        queryDocentes = queryCreator(
+            `SELECT d.documento, d.id_departamento, u.nombres, u.apellidos FROM public.docente d INNER JOIN public.usuario u ON d.documento = u.documento`
+        ).then((result) => {
+            return (result.rows);
+        })
+        queryDocentes.then((rows) => {
+            res.json(rows);
+        })
+    })
+    .put(sendNull)
+    .delete(sendNull)
+    .post(sendNull);
+
+    indexRouter.route('/bienestar/planes')
+    .get((req, res, next) => {
+        estudiante = req.query.documentoEstudiante;
+        queryPlanes = queryCreator(
+            `SELECT * FROM public.estado_semestre WHERE documento = '${estudiante}'`
+        ).then((result) => {
+            return (result.rows);
+        })
+        queryPlanes.then((rows) => {
+            res.json(rows);
+        })
+    })
+    .put(sendNull)
+    .delete(sendNull)
+    .post(sendNull);
 
 module.exports = indexRouter;

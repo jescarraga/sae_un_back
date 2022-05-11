@@ -1,32 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const database = require('../database');
+const queryCreator = require('../queryUtilities/queryCreator');
+const sendNull = require('../queryUtilities/queryNull');
+
 
 //const { jsonp } = require('express/lib/response');
-
 const indexRouter = express.Router();
 
 // the system is going to use text fromat
 indexRouter.use(bodyParser.json());
 
-
-
-//function that responses with a null value
-sendNull = (req, res, next) =>{
-    res.send(null);
-}
-
-//query maker and handler
-function queryCreator(theQuery){
-    return(
-        new Promise((resolve, reject) =>{
-            database.query(theQuery,(err, res1)=>{
-                if (err) resolve(err);
-                else resolve(res1);
-            })
-        })
-    )
-}
 
 indexRouter.route('/auth')
     .all((req, res, next) => {
@@ -80,22 +63,33 @@ indexRouter.route('/auth')
         })
         .catch(()=> {null});
 
-        Promise.all([prom1,prom2, prom3]).then(([r1,r2,r3]) => {
+        prom4 = queryCreator(
+            `SELECT documento FROM public.usuario where usuario_un like '${request.username}';`
+        ).then((result) => {
+            if(result.rowCount > 0){
+                return result.rows[0].documento;
+            }else{
+                return 0;
+            }
+        })
+        .catch(()=> {null});
+
+        Promise.all([prom1,prom2, prom3, prom4]).then(([r1,r2,r3,r4]) => {
             
             respuesta = {
                 "encontro_al_usuario": r1,
                 "usuario_y_contraseña":r2,
                 "tipoUsuario":r3,
                 "usuario_registrado":request.username,
-                "status":false
+                "status":false,
+                "documento":r4
             };
 
             if(r1 == true && r2 == true) {
-                respuesta.status = true
+                    respuesta.status = true;      
             }
-            
-            return res.send(respuesta);
-        })
+            return res.send(respuesta);          
+        }) 
     }
     )
     .put(sendNull)

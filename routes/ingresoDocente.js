@@ -8,7 +8,7 @@ const docenteRouter = express.Router();
 docenteRouter.use(bodyParser.json());
 var getQuery = `SELECT id_departamento, nombre_departamento FROM public.departamento;`;
 
-docenteRouter.route('/docente')
+docenteRouter.route('/ingresoDocente')
     .all((req, res, next) => {
         res.statusCode = 200;
         next();
@@ -30,33 +30,22 @@ async function docenteR(req, res, next) {
     if (request.id_tipo_usuario == 2 && departaments.includes(+request.id_departamento)) {
 
         var insertUsuario = await queryCreator(
-            `INSERT INTO public.usuario(documento, nombres, apellidos, usuario_un, estado, sexo) 
-                        VALUES (
+            `CALL public.insertdocente(
                             '${request.documento}', 
                             '${request.nombres}', 
                             '${request.apellidos}', 
                             '${request.usuario_un}', 
-                            '${request.estado}', 
-                            '${request.sexo}');`
+                            ${request.estado == 1 ? true : false}, 
+                            ${request.sexo == 1 ? true : false},
+                            ${request.id_departamento}, 
+                            ${request.id_tipo_usuario});`
         );
 
         if (!insertUsuario.command) {
-            var envio = { status: "No es posible ingresar un usuario con esos datos: " + insertUsuario.detail };
+            var envio = { status: "No es posible ingresar un usuario con esos datos: " + insertUsuario};
             return res.send(envio);
-        }
-
-        insertDocentes = await queryCreator(
-            `INSERT INTO public.docente(documento, id_departamento) values('${request.documento}','${request.id_departamento}');`
-        );
-
-        insertPerfil = await queryCreator(
-            `INSERT INTO public.perfil(id_tipo_usuario, documento) values('${request.id_tipo_usuario}','${request.documento}')`
-        );
-
-        if (insertDocentes.command && insertPerfil.command && insertUsuario.command) {
-            return res.send({ status: true });
         } else {
-            var resp = { status: insertDocentes.detail + "\n" + insertPerfil.detail + "\n" + insertUsuario.detail };
+            var resp = { status: true };
             return res.send(resp);
         }
 

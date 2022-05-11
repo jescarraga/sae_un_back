@@ -8,7 +8,7 @@ const indexRouter = express.Router();
 
 indexRouter.use(bodyParser.json());
 
-indexRouter.route('/bienestar')
+indexRouter.route('/ingresoBienestar')
     .all((req, res, next) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');

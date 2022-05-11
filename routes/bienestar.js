@@ -6,6 +6,20 @@ const axios = require('axios');
 
 const indexRouter = express.Router();
 
+/*
+    Allows the creation of querys and responses with promise to handle it
+*/
+function queryCreator(theQuery) {
+    return (
+        new Promise((resolve, reject) => {
+            database.query(theQuery, (err, res1) => {
+                if (err) resolve(err);
+                else resolve(res1);
+            });
+        })
+    );
+}
+
 indexRouter.use(bodyParser.json());
 
 indexRouter.route('/ingresoBienestar')
@@ -53,7 +67,7 @@ indexRouter.route('/ingresoBienestar')
 
             return (
                 new Promise((resolve, reject) => {
-                    
+
                     database.query(`INSERT INTO public.usuario(
                         documento, nombres, apellidos, usuario_un, estado, sexo)
                         VALUES ('${toInsert.documento}', '${toInsert.nombres}', '${toInsert.apellidos}', '${toInsert.usuario_un}', '${toInsert.estado}', '${toInsert.sexo}');
@@ -96,5 +110,17 @@ indexRouter.route('/ingresoBienestar')
         res.end('will delete something' + req.body.name + '  ' + req.body.description);
     });
 
+indexRouter.route('/bienestar/docentes')
+    .get((req, res, next) => {
+
+        queryDocentes = queryCreator(
+            `SELECT d.documento, d.id_departamento, u.nombres, u.apellidos FROM public.docente d INNER JOIN public.usuario u ON d.documento = u.documento`
+        ).then((result) => {
+            return (result.rows);
+        })
+        queryDocentes.then((rows) => {
+            res.json(rows);
+        })
+    })
 
 module.exports = indexRouter;

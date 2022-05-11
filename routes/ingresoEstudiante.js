@@ -3,11 +3,9 @@ const bodyParser = require('body-parser');
 const queryCreator = require('../queryUtilities/queryCreator');
 const sendNull = require('../queryUtilities/queryNull');
 
-//const { jsonp } = require('express/lib/response');
 
 const ingresoEstudianteRouter = express.Router();
 
-// the system is going to use text fromat
 ingresoEstudianteRouter.use(bodyParser.json());
 var getQuery = `SELECT codigo, nombre_programa_curricular FROM public.programas_curriculares;`;
 

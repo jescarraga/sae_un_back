@@ -63,22 +63,33 @@ indexRouter.route('/auth')
         })
         .catch(()=> {null});
 
-        Promise.all([prom1,prom2, prom3]).then(([r1,r2,r3]) => {
+        prom4 = queryCreator(
+            `SELECT documento FROM public.usuario where usuario_un like '${request.username}';`
+        ).then((result) => {
+            if(result.rowCount > 0){
+                return result.rows[0].documento;
+            }else{
+                return 0;
+            }
+        })
+        .catch(()=> {null});
+
+        Promise.all([prom1,prom2, prom3, prom4]).then(([r1,r2,r3,r4]) => {
             
             respuesta = {
                 "encontro_al_usuario": r1,
                 "usuario_y_contraseña":r2,
                 "tipoUsuario":r3,
                 "usuario_registrado":request.username,
-                "status":false
+                "status":false,
+                "documento":r4
             };
 
             if(r1 == true && r2 == true) {
-                respuesta.status = true
+                    respuesta.status = true;      
             }
-            
-            return res.send(respuesta);
-        })
+            return res.send(respuesta);          
+        }) 
     }
     )
     .put(sendNull)

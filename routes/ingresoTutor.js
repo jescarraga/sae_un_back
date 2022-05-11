@@ -42,8 +42,9 @@ ingresoTutorRouter.route('/ingresoTutor')
     .get((req, res, next) => {
         docente = req.query.documentoDocente;
         estudiante = req.query.documentoEstudiante;
-        if (Object.keys(req.query).length === 0) {
+        if (Object.keys(req.query).length === 0) { //cuando no hay parámetros
             consultaTotal = queryCreator(
+                //Query para seleccionar todos los estudiantes activos con tutores asignados
                 `SELECT * FROM tutores WHERE documento_estudiante in (select documento from estado_semestre where cursando = true);`
 
             ).then((result) => {
@@ -54,8 +55,9 @@ ingresoTutorRouter.route('/ingresoTutor')
             consultaTotal.then((rows) => {
                 res.json(rows);
             })
-        } else if (!docente) {
+        } else if (!docente) { //Si se envía solo el estudiante
             consultaEstudiante = queryCreator(
+                //Query para obtener docentes tutores asignados a un estudiante
                 `select t.documento_docente , t.documento_estudiante , t.codigo_plan , u.nombres , u.apellidos , u.usuario_un
                 from tutores t inner join usuario u on t.documento_docente =u.documento
                 WHERE documento_estudiante = '${estudiante}' `
@@ -67,8 +69,9 @@ ingresoTutorRouter.route('/ingresoTutor')
             consultaEstudiante.then((rows) => {
                 res.json(rows);
             })
-        } else if (!estudiante) {
+        } else if (!estudiante) {//Si se envía solo el docente
             consultaDocente = queryCreator(
+                //Query para obtener estudiantes asignados a un docente
                 `select t.documento_docente , t.documento_estudiante , t.codigo_plan , u.nombres , u.apellidos , u.usuario_un
                 from tutores t inner join usuario u on t.documento_estudiante =u.documento
                 WHERE documento_estudiante in (select documento from estado_semestre where cursando = true) AND documento_docente = '${docente}' ;`
@@ -82,8 +85,9 @@ ingresoTutorRouter.route('/ingresoTutor')
 
                 res.json(rows);
             })
-        } else if (estudiante && docente) {
+        } else if (estudiante && docente) {//si se envían ambas
             consultaAmbas = queryCreator(
+                //query para obtener asignaciones de un tutor con un estudiante
                 `SELECT * FROM tutores WHERE documento_docente = '${docente}' AND documento_estudiante = '${estudiante}' and documento_estudiante in (select documento from estado_semestre where  cursando = true);`
 
             ).then((result) => {
@@ -103,6 +107,7 @@ ingresoTutorRouter.route('/ingresoTutor')
 
 
         promEstudiante = queryCreator(
+            //se verifica si existe el estudiante y está activo
             `select count(1) from estado_semestre where documento =  '${request.documentoEstudiante}'  and documento in (select documento from estado_semestre where documento = '${request.documentoEstudiante}' and cursando = true);`
         ).then((result) => {
             if (result.rows[0].count != 0) {
@@ -114,6 +119,7 @@ ingresoTutorRouter.route('/ingresoTutor')
             .catch(() => { null });
 
         promDocente = queryCreator(
+            //verificar existencia de docente
             `SELECT COUNT(1) FROM docente WHERE documento = '${request.documentoDocente}' ;`
 
         ).then((result) => {
@@ -128,6 +134,7 @@ ingresoTutorRouter.route('/ingresoTutor')
 
 
         promPlan = queryCreator(
+            //verificar existencia de plan
             `SELECT COUNT(1) FROM programas_curriculares WHERE codigo = '${request.codigoPlan}' ;`
 
         ).then((result) => {
@@ -141,6 +148,7 @@ ingresoTutorRouter.route('/ingresoTutor')
             .catch(() => { null });
 
         promDuplicado = queryCreator(
+            //verificar si hay duplicados estudiante-plan
             `SELECT COUNT(1) FROM tutores WHERE codigo_plan = '${request.codigoPlan}' 
             and documento_estudiante = '${request.documentoEstudiante}';`
 
@@ -152,6 +160,8 @@ ingresoTutorRouter.route('/ingresoTutor')
                 return false;
             }
         })
+
+        //para insertar en BD 
         promInsert = queryCreator(
             `INSERT INTO public.tutores (documento_docente,
             documento_estudiante,
@@ -166,7 +176,6 @@ ingresoTutorRouter.route('/ingresoTutor')
             .catch(() => { null });
 
         Promise.all([promEstudiante, promDocente, promPlan, promDuplicado]).then(([estudiante, docente, plan, duplicado]) => {
-            //console.log(estudiante, docente);
             res.statusCode = 404;
             if (!estudiante && !docente) {
                 res.json({

@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const database = require('../queryUtilities/database');
 const axios = require('axios');
-
+const sendNull = require('../queryUtilities/queryNull');
 
 const indexRouter = express.Router();
 
@@ -122,6 +122,9 @@ indexRouter.route('/bienestar/docentes')
             res.json(rows);
         })
     })
+    .put(sendNull)
+    .delete(sendNull)
+    .post(sendNull);
 
     indexRouter.route('/bienestar/planes')
     .get((req, res, next) => {
@@ -135,5 +138,8 @@ indexRouter.route('/bienestar/docentes')
             res.json(rows);
         })
     })
+    .put(sendNull)
+    .delete(sendNull)
+    .post(sendNull);
 
 module.exports = indexRouter;

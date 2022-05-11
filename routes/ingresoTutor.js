@@ -163,11 +163,9 @@ ingresoTutorRouter.route('/ingresoTutor')
 
         //para insertar en BD 
         promInsert = queryCreator(
-            `INSERT INTO public.tutores (documento_docente,
-            documento_estudiante,
-            codigo_plan) VALUES (
-            '${request.documentoDocente}',
+            `CALL inserttutor(
             '${request.documentoEstudiante}',
+            '${request.documentoDocente}',
             ${request.codigoPlan}
             )`
         ).then((result) => {

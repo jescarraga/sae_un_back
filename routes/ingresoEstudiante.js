@@ -31,7 +31,7 @@ ingresoEstudianteRouter.route('/ingresoEstudiante')
         if (request.id_tipo_usuario == 1 && programas.includes(+request.codigo)) {
     
             var insertEstudiante = await queryCreator(
-                `CALL public.insertdocente(
+                `CALL public.insertestudiante(
                                 '${request.documento}', 
                                 '${request.nombres}', 
                                 '${request.apellidos}', 

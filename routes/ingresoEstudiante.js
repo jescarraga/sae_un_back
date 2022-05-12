@@ -39,7 +39,7 @@ ingresoEstudianteRouter.route('/ingresoEstudiante')
                                 ${request.estado == 1 ? true : false}, 
                                 ${request.sexo == 1 ? true : false},
                                 ${request.codigo},
-                                ${request.fecha_ingreso},
+                                '${request.fecha_ingreso}',
                                 ${request.cursando == 1 ? true : false},
                                 ${request.documento_nacional == 1 ? true : false}, 
                                 ${request.id_tipo_usuario});`

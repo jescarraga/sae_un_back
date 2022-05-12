@@ -40,8 +40,8 @@ ingresoEstudianteRouter.route('/ingresoEstudiante')
                                 ${request.sexo == 1 ? true : false},
                                 ${request.codigo},
                                 ${request.fecha_ingreso},
-                                ${request.cursando},
-                                ${request.documento_nacional}, 
+                                ${request.cursando == 1 ? true : false},
+                                ${request.documento_nacional == 1 ? true : false}, 
                                 ${request.id_tipo_usuario});`
             );
     

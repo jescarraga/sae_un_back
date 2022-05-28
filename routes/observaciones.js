@@ -13,11 +13,22 @@ observacionesRouter.route('/observaciones')
     })
     .post(docenteR)
     .get(async (req, res, next) => {
-        var selectEstudiantes = await queryCreator(
-            `select * from public.select_estudiantes_de_docente('${req.query.documento}');`
-        );
 
-        res.send(selectEstudiantes.rows.map((r) => { return [r.nombres, r.apellidos, r.documento_estudiante, r.codigo_plan, r.nombre_programa_curricular] }));
+        if (req.query.tipo == 'estudiantes') {
+            var selectEstudiantes = await queryCreator(
+                `select * from public.select_estudiantes_de_docente('${req.query.documento}');`
+            );
+
+            res.send(selectEstudiantes.rows.map((r) => { return [r.nombres, r.apellidos, r.documento_estudiante, r.codigo_plan, r.nombre_programa_curricular] }));
+        } else if (req.query.tipo == 'observaciones') {
+            var selectEstudiantes = await queryCreator(
+                `select * from public.observaciones_de_docente('${req.query.documento}');`
+            );
+
+            res.send(selectEstudiantes.rows.map((r) => { return [r.nombres, r.apellidos, r.documento_estudiante, r.codigo_observacion, r.observacion] }));
+        } else {
+            res.send({ status: 'get method nod valid' })
+        }
     })
     .put(sendNull)
     .delete(sendNull);
@@ -47,7 +58,7 @@ async function docenteR(req, res, next) {
         }
     }
     else {
-        res.send({ status: "ese estudiante no tiene ese plan asociado con ese docente "});
+        res.send({ status: "ese estudiante no tiene ese plan asociado con ese docente " });
     }
 
 }

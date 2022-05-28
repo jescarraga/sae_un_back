@@ -58,7 +58,7 @@ async function docenteR(req, res, next) {
         }
     }
     else {
-        res.send({ status: "ese estudiante no tiene ese plan asociado con ese docente " });
+        res.send({ status: "ese estudiante no tiene ese plan asociado con ese docente"});
     }
 
 }

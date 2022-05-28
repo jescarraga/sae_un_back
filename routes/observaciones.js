@@ -26,7 +26,7 @@ observacionesRouter.route('/observaciones')
 
 async function docenteR(req, res, next) {
     var request = req.body;
-    var res1 = await queryCreator(`select codigo_plan FROM public.tutores where documento_estudiante = '${request.documento_estudiante}';`);
+    var res1 = await queryCreator(`select codigo_plan FROM public.tutores where documento_estudiante = '${request.documento_estudiante}' and documento_docente = '${request.documento_docente}';`);
     var codigos_estudiante = res1.rows.map((r) => { return r.codigo_plan });
 
     if (codigos_estudiante.includes(+request.codigo_plan)) {
@@ -47,7 +47,7 @@ async function docenteR(req, res, next) {
         }
     }
     else {
-        res.send({ status: "ese estudiante no tiene ese plan: "});
+        res.send({ status: "ese estudiante no tiene ese plan asociado con ese docente "});
     }
 
 }

@@ -27,16 +27,20 @@ observacionesRouter.route('/observaciones')
 async function docenteR(req, res, next) {
     var request = req.body;
     var res1 = await queryCreator(`SELECT codigo FROM public.programas_curriculares;`);
-    var departaments = res1.rows.map((r) => { return r.id_departamento });
+    var codigo_planes = res1.rows.map((r) => { return r.id_departamento });
 
-    if (departaments.includes(+request.id_departamento)) {
+    if (codigo_planes.includes(+request.codigo_plan)) {
 
-        var insertUsuario = await queryCreator(
-            `CALL public.insertobservacion(':documento_docente',':documento_estudiante',':codigo_plan,:observacion');`
+        var insertobservacion = await queryCreator(
+            `CALL public.insertobservacion(
+                '${request.documento_docente}',
+                '${request.documento_estudiante}',
+                '${request.codigo_plan},
+                ${request.observacion}');`
         );
 
-        if (!insertUsuario.command) {
-            var envio = { status: "No es posible ingresar un usuario con esos datos: " + insertUsuario };
+        if (!insertobservacion.command) {
+            var envio = { status: "No es posible ingresar una observacion con esos datos: " + insertobservacion };
             return res.send(envio);
         } else {
             var resp = { status: true };
@@ -44,7 +48,7 @@ async function docenteR(req, res, next) {
         }
 
     } else {
-        res.send({ status: "tipo usuario: " + request.id_tipo_usuario + " o departamento: " + request.id_departamento + " -> no validos" });
+        res.send({ status: "codigo plan no existe: " +  request.codigo_plan});
     }
 }
 

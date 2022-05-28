@@ -17,7 +17,7 @@ observacionesRouter.route('/observaciones')
             `select * from public.select_estudiantes_de_docente('${req.query.documento}');`
         );
 
-        res.send(selectEstudiante.rows.map((r) => { return [r.nombres, r.apellidos, r.documento_estudiante, r.observacion] }));
+        res.send(selectEstudiante.rows.map((r) => { return [r.nombres, r.apellidos, r.documento_estudiante, r.codigo_plan, r.observacion] }));
     })
     .put(sendNull)
     .delete(sendNull);
@@ -26,30 +26,25 @@ observacionesRouter.route('/observaciones')
 
 async function docenteR(req, res, next) {
     var request = req.body;
-    var res1 = await queryCreator(`SELECT codigo FROM public.programas_curriculares;`);
-    var codigo_planes = res1.rows.map((r) => { return r.id_departamento });
 
-    if (codigo_planes.includes(+request.codigo_plan)) {
 
-        var insertobservacion = await queryCreator(
-            `CALL public.insertobservacion(
-                '${request.documento_docente}',
-                '${request.documento_estudiante}',
-                '${request.codigo_plan},
-                ${request.observacion}');`
-        );
+    var insertobservacion = await queryCreator(
+        `CALL public.insertobservacion(
+            '${request.documento_docente}',
+            '${request.documento_estudiante}',
+            ${request.codigo_plan},
+            '${request.observacion}');`
+    );
 
-        if (!insertobservacion.command) {
-            var envio = { status: "No es posible ingresar una observacion con esos datos: " + insertobservacion };
-            return res.send(envio);
-        } else {
-            var resp = { status: true };
-            return res.send(resp);
-        }
-
+    if (!insertobservacion.command) {
+        var envio = { status: "No es posible ingresar una observacion con esos datos: " + insertobservacion };
+        return res.send(envio);
     } else {
-        res.send({ status: "codigo plan no existe: " +  request.codigo_plan});
+        var resp = { status: true };
+        return res.send(resp);
     }
+
+
 }
 
 

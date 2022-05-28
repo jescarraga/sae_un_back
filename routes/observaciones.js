@@ -14,7 +14,7 @@ observacionesRouter.route('/observaciones')
     .post(docenteR)
     .get(async (req, res, next) => {
         var selectEstudiante = await queryCreator(
-            `select * from public.select_estudiantes_de_docente('${rea.documento}');`
+            `select * from public.select_estudiantes_de_docente('${req.query.documento}');`
         );
 
         res.send(selectEstudiante.rows.map((r) => { return [r.nombres, r.apellidos, r.documento_estudiante, r.observacion] }));

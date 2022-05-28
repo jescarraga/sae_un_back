@@ -17,14 +17,14 @@ observacionesRouter.route('/observaciones')
             `select * from public.select_estudiantes_de_docente('${rea.documento}');`
         );
 
-        res.send(selectEstudiante.rows.map((r) => { return [r.nombres, r.apellidos, r.documento_estudiante, r.nombre_programa_curricular] }));
+        res.send(selectEstudiante.rows.map((r) => { return [r.nombres, r.apellidos, r.documento_estudiante, r.observacion] }));
     })
     .put(sendNull)
     .delete(sendNull);
 
 
 async function docenteR(req, res, next) {
-    res.send({ status: "No implemented"});
+    res.send({ status: "Estamos trabajando para tener esta chingadera funcionando"});
     
 }
 

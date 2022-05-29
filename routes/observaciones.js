@@ -62,33 +62,33 @@ observacionesRouter.route('/observaciones/all')
     })
     .post(sendNull)
     .get(async (req, res, next) => {
-        var selectEstudiantes = await queryCreator(
-            `select distinct
-            public.usuario.documento,
-            public.usuario.nombres,
-            public.usuario.apellidos,
-            public.tutores.documento_docente,
-            (select nombres from public.usuario where documento = public.tutores.documento_docente),
-            (select apellidos from public.usuario where documento = public.tutores.documento_docente),
-            public.tutores.codigo_plan,
-            public.programas_curriculares.nombre_programa_curricular,
-            array(select concat(codigo_observacion,':', observacion,':',fecha_observacion) from public.observaciones where public.observaciones.documento_estudiante = public.usuario.documento and public.observaciones.documento_docente = public.tutores.documento_docente) as observaciones
-        from
-            public.tutores
-        inner join public.usuario on documento = public.tutores.documento_estudiante
-        inner join public.programas_curriculares on codigo = public.tutores.codigo_plan
-        inner join public.observaciones on documento = observaciones.documento_estudiante;`
-        );
+
+        if (!req.query.busqueda) {
+            var selectEstudiantes = await queryCreator(
+                `select * from public.all_observaciones()`
+            );
 
 
-        for (let index = 0; index < selectEstudiantes.rows.length; index++) {
-            var lista = [];
-            selectEstudiantes.rows[index].observaciones.forEach((s) => { lista.push(s.split(':'))});
-            selectEstudiantes.rows[index].observaciones = lista;
+            for (let index = 0; index < selectEstudiantes.rows.length; index++) {
+                var lista = [];
+                selectEstudiantes.rows[index].observaciones.forEach((s) => { lista.push(s.split(':')) });
+                selectEstudiantes.rows[index].observaciones = lista;
+            }
+
+
+            res.send(selectEstudiantes.rows);
+        } else {
+            var selectEstudiantes = await queryCreator(
+                `select * from public.search_observaciones('${req.query.busqueda}');`
+            );
+
+            for (let index = 0; index < selectEstudiantes.rows.length; index++) {
+                var lista = [];
+                selectEstudiantes.rows[index].observaciones.forEach((s) => { lista.push(s.split(':')) });
+                selectEstudiantes.rows[index].observaciones = lista;
+            }
+            res.send(selectEstudiantes.rows);
         }
-
-
-        res.send(selectEstudiantes.rows);
     })
     .put(sendNull)
     .delete(sendNull);

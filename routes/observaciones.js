@@ -16,8 +16,10 @@ observacionesRouter.route('/observaciones')
         var selectEstudiantes = await queryCreator(
             `select * from public.observaciones_y_estudiantes_docente('${req.query.documento}');`
         );
-
-        res.send(selectEstudiantes.rows.map((r) => { return {nombre: r.nombres, apellidos: r.apellidos,documento: r.documento_estudiante,plan: r.codigo_plan,nombre_plan: r.nombre_programa_curricular,observaciones: r.observaciones.map(sub_r => sub_r.split(':'))} })[0]);
+        var lista = [];
+        selectEstudiantes.rows[0].observaciones.forEach((s) => { lista.push(s.split(':')) });
+        selectEstudiantes.rows[0].observaciones = lista;
+        res.send(selectEstudiantes.rows[0]);
     })
     .put(sendNull)
     .delete(sendNull);
@@ -53,6 +55,43 @@ async function docenteR(req, res, next) {
 }
 
 
+observacionesRouter.route('/observaciones/all')
+    .all((req, res, next) => {
+        res.statusCode = 200;
+        next();
+    })
+    .post(sendNull)
+    .get(async (req, res, next) => {
+        var selectEstudiantes = await queryCreator(
+            `select distinct
+            public.usuario.documento,
+            public.usuario.nombres,
+            public.usuario.apellidos,
+            public.tutores.documento_docente,
+            (select nombres from public.usuario where documento = public.tutores.documento_docente),
+            (select apellidos from public.usuario where documento = public.tutores.documento_docente),
+            public.tutores.codigo_plan,
+            public.programas_curriculares.nombre_programa_curricular,
+            array(select concat(codigo_observacion,':', observacion) from public.observaciones where public.observaciones.documento_estudiante = public.usuario.documento and public.observaciones.documento_docente = public.tutores.documento_docente) as observaciones
+        from
+            public.tutores
+        inner join public.usuario on documento = public.tutores.documento_estudiante
+        inner join public.programas_curriculares on codigo = public.tutores.codigo_plan
+        inner join public.observaciones on documento = observaciones.documento_estudiante;`
+        );
+
+
+        for (let index = 0; index < selectEstudiantes.rows.length; index++) {
+            var lista = [];
+            selectEstudiantes.rows[index].observaciones.forEach((s) => { lista.push(s.split(':'))});
+            selectEstudiantes.rows[index].observaciones = lista;
+        }
+
+
+        res.send(selectEstudiantes.rows);
+    })
+    .put(sendNull)
+    .delete(sendNull);
 
 
 

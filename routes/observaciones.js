@@ -17,7 +17,7 @@ observacionesRouter.route('/observaciones')
             `select * from public.observaciones_y_estudiantes_docente('${req.query.documento}');`
         );
 
-        res.send(selectEstudiantes.rows.map((r) => { return {nombre: r.nombres, apellidos: r.apellidos,documento: r.documento_estudiante,plan: r.codigo_plan,nombre_plan: r.nombre_programa_curricular,observaciones: r.observaciones.map(sub_r => sub_r.split(':'))} }));
+        res.send(selectEstudiantes.rows.map((r) => { return {nombre: r.nombres, apellidos: r.apellidos,documento: r.documento_estudiante,plan: r.codigo_plan,nombre_plan: r.nombre_programa_curricular,observaciones: r.observaciones.map(sub_r => sub_r.split(':'))} })[0]);
     })
     .put(sendNull)
     .delete(sendNull);

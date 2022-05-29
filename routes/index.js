@@ -24,7 +24,7 @@ indexRouter.route('/auth')
 
 
         prom1 = queryCreator(
-            `SELECT COUNT(1) FROM password WHERE usuario_un_p like '${request.username}';`
+            `SELECT COUNT(1) FROM db_password WHERE usuario_un_p like '${request.username}';`
             ).then((result) => {
                 
                 if(result.rows[0].count == 1){
@@ -36,7 +36,7 @@ indexRouter.route('/auth')
         .catch(()=> {null});
         
         prom2 = queryCreator(
-            `SELECT COUNT(1) FROM password WHERE usuario_un_p like
+            `SELECT COUNT(1) FROM db_password WHERE usuario_un_p like
                 '${request.username}'
                 and password_usuario like 
                 '${request.password}';`

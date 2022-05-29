@@ -72,7 +72,7 @@ observacionesRouter.route('/observaciones/all')
             (select apellidos from public.usuario where documento = public.tutores.documento_docente),
             public.tutores.codigo_plan,
             public.programas_curriculares.nombre_programa_curricular,
-            array(select concat(codigo_observacion,':', observacion) from public.observaciones where public.observaciones.documento_estudiante = public.usuario.documento and public.observaciones.documento_docente = public.tutores.documento_docente) as observaciones
+            array(select concat(codigo_observacion,':', observacion,':',fecha_observacion) from public.observaciones where public.observaciones.documento_estudiante = public.usuario.documento and public.observaciones.documento_docente = public.tutores.documento_docente) as observaciones
         from
             public.tutores
         inner join public.usuario on documento = public.tutores.documento_estudiante

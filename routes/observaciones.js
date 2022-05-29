@@ -79,7 +79,13 @@ observacionesRouter.route('/observaciones/all')
             res.send(selectEstudiantes.rows);
         } else {
             var selectEstudiantes = await queryCreator(
-                `select * from public.search_observaciones('${req.query.busqueda}');`
+                `select * from public.all_observaciones() where to_tsvector(
+                    documento_docente || ' ' ||
+                    documento_estudiante || ' ' ||
+                    nombres || ' ' ||
+                    nombres_docente || ' ' ||
+                    apellidos_docente || ' ' ||
+                    apellidos)@@ to_tsquery('${req.query.busqueda}');`
             );
 
             for (let index = 0; index < selectEstudiantes.rows.length; index++) {

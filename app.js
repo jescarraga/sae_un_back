@@ -12,6 +12,7 @@ var bienestarRouter = require('./routes/bienestar');
 var ingresoEstudianteRouter = require('./routes/ingresoEstudiante');
 var ingresoTutorRouter = require('./routes/ingresoTutor');
 var observacionesRouter = require('./routes/observaciones');
+var observacionesRouter = require('./routes/remisiones');
 
 var app = express();
 

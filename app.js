@@ -13,6 +13,7 @@ var ingresoEstudianteRouter = require('./routes/ingresoEstudiante');
 var ingresoTutorRouter = require('./routes/ingresoTutor');
 var observacionesRouter = require('./routes/observaciones');
 var observacionesRouter = require('./routes/remisiones');
+const remisionesBienestar = require('./routes/remisionesBienestar');
 
 var app = express();
 
@@ -28,6 +29,7 @@ app.use('/', bienestarRouter);
 app.use('/',docenteRouter);
 app.use('/', ingresoTutorRouter);
 app.use('/', observacionesRouter);
+app.use('/', remisionesBienestar)
 
 
 // catch 404 and forward to error handler

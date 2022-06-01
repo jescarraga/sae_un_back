@@ -89,16 +89,5 @@ async function docenteObtenerRemisionesEstudiante(req, res, next) {
   return res.send(res1);
 }
 
-async function listadoEstudiantes(req, res, next) {
-  var selectEstudiantes = await queryCreator(
-    `select * from public.observaciones_y_estudiantes_docente('${req.query.documento}');`
-  );
-  var lista = [];
-  selectEstudiantes.rows[0].observaciones.forEach((s) => {
-    lista.push(s.split(":"));
-  });
-  selectEstudiantes.rows[0].observaciones = lista;
-  res.send(selectEstudiantes.rows[0]);
-}
 
 module.exports = remisionesDocenteRouter;

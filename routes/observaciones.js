@@ -16,10 +16,14 @@ observacionesRouter.route('/observaciones')
         var selectEstudiantes = await queryCreator(
             `select * from public.observaciones_y_estudiantes_docente('${req.query.documento}');`
         );
-        var lista = [];
-        selectEstudiantes.rows[0].observaciones.forEach((s) => { lista.push(s.split(':')) });
-        selectEstudiantes.rows[0].observaciones = lista;
-        res.send(selectEstudiantes.rows[0]);
+
+        for (let index = 0; index < selectEstudiantes.rows.length; index++) {
+            var lista = [];
+            selectEstudiantes.rows[index].observaciones.forEach((s) => { lista.push(s.split(':')) });
+            selectEstudiantes.rows[index].observaciones = lista;
+        }
+
+        res.send(selectEstudiantes.rows);
     })
     .put(sendNull)
     .delete(sendNull);

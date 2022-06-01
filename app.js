@@ -5,6 +5,7 @@ var createError = require("http-errors");
 var logger = require("morgan");
 var cors = require("cors");
 
+
 var indexRouter = require("./routes/index");
 var docenteRouter = require("./routes/ingresoDocente");
 var bienestarRouter = require("./routes/bienestar");
@@ -12,6 +13,8 @@ var ingresoEstudianteRouter = require("./routes/ingresoEstudiante");
 var ingresoTutorRouter = require("./routes/ingresoTutor");
 var observacionesRouter = require("./routes/observaciones");
 var remisionesDocenteRouter = require("./routes/remisionesDocente");
+const remisionesBienestar = require('./routes/remisionesBienestar');
+
 
 var app = express();
 
@@ -27,6 +30,8 @@ app.use("/", docenteRouter);
 app.use("/", ingresoTutorRouter);
 app.use("/", observacionesRouter);
 app.use("/", remisionesDocenteRouter);
+app.use('/', remisionesBienestar)
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

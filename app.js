@@ -12,7 +12,7 @@ var bienestarRouter = require('./routes/bienestar');
 var ingresoEstudianteRouter = require('./routes/ingresoEstudiante');
 var ingresoTutorRouter = require('./routes/ingresoTutor');
 var observacionesRouter = require('./routes/observaciones');
-var observacionesRouter = require('./routes/remisiones');
+var remisionesDocenteRouter = require('./routes/remisionesDocente');
 
 var app = express();
 
@@ -28,6 +28,7 @@ app.use('/', bienestarRouter);
 app.use('/',docenteRouter);
 app.use('/', ingresoTutorRouter);
 app.use('/', observacionesRouter);
+app.use('/', remisionesDocenteRouter);
 
 
 // catch 404 and forward to error handler

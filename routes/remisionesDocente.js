@@ -91,10 +91,10 @@ async function docenteObtenerRemisionesEstudiante(req, res, next) {
       public.remisiones.motivo_remision, 
       public.remisiones.fecha, 
       public.remisiones.atendida,
-      public.programas_curriculares.nombre_programa_curricular
+      public.tipo_remisiones.nombre_remision
       FROM public.remisiones
-      JOIN public.programas_curriculares
-      ON public.programas_curriculares.codigo =  public.remisiones.codigo_plan
+      JOIN public.tipo_remisiones
+      ON public.tipo_remisiones.codigo_tipo_remision  =  public.remisiones.codigo_tipo_remision
       where documento_docente like '${request.documentoDocente}';`);
   var res1 = consulta.rows;
   return res.send(res1);

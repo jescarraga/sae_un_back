@@ -57,12 +57,11 @@ async function docenteInsertarRemision(req, res, next) {
 async function obtenerTiposDeRemisiones(req, res, next) {
   var consulta = await queryCreator(`select * FROM public.tipo_remisiones;`);
   var dict = {};
-  
+
   for (let index = 0; index < consulta.rows.length; index++) {
-    
     var tipo = JSON.parse(consulta.rows[index].codigo_tipo_remision);
     var valor = consulta.rows[index].nombre_remision;
-    dict [tipo] = valor;
+    dict[tipo] = valor;
     //lista.push({tipo : valor});
   }
   console.log(dict);
@@ -88,6 +87,18 @@ async function docenteObtenerRemisionesEstudiante(req, res, next) {
     '${request.documentoDocente}';`);
   var res1 = consulta.rows;
   return res.send(res1);
+}
+
+async function listadoEstudiantes(req, res, next) {
+  var selectEstudiantes = await queryCreator(
+    `select * from public.observaciones_y_estudiantes_docente('${req.query.documento}');`
+  );
+  var lista = [];
+  selectEstudiantes.rows[0].observaciones.forEach((s) => {
+    lista.push(s.split(":"));
+  });
+  selectEstudiantes.rows[0].observaciones = lista;
+  res.send(selectEstudiantes.rows[0]);
 }
 
 module.exports = remisionesDocenteRouter;

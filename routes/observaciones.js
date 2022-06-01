@@ -6,26 +6,29 @@ const sendNull = require("../queryUtilities/queryNull");
 const observacionesRouter = express.Router();
 observacionesRouter.use(bodyParser.json());
 
-observacionesRouter
-  .route("/observaciones")
-  .all((req, res, next) => {
-    res.statusCode = 200;
-    next();
-  })
-  .post(docenteR)
-  .get(async (req, res, next) => {
-    var selectEstudiantes = await queryCreator(
-      `select * from public.observaciones_y_estudiantes_docente('${req.query.documento}');`
-    );
-    var lista = [];
-    selectEstudiantes.rows[0].observaciones.forEach((s) => {
-      lista.push(s.split(":"));
-    });
-    selectEstudiantes.rows[0].observaciones = lista;
-    res.send(selectEstudiantes.rows[0]);
-  })
-  .put(sendNull)
-  .delete(sendNull);
+observacionesRouter.route('/observaciones')
+    .all((req, res, next) => {
+        res.statusCode = 200;
+        next();
+    })
+    .post(docenteR)
+    .get(async (req, res, next) => {
+        var selectEstudiantes = await queryCreator(
+            `select * from public.observaciones_y_estudiantes_docente('${req.query.documento}');`
+        );
+
+        for (let index = 0; index < selectEstudiantes.rows.length; index++) {
+            var lista = [];
+            selectEstudiantes.rows[index].observaciones.forEach((s) => { lista.push(s.split(':')) });
+            selectEstudiantes.rows[index].observaciones = lista;
+        }
+
+        res.send(selectEstudiantes.rows);
+    })
+    .put(sendNull)
+    .delete(sendNull);
+
+
 
 async function docenteR(req, res, next) {
   var request = req.body;

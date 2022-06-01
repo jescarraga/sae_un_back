@@ -56,8 +56,18 @@ async function docenteInsertarRemision(req, res, next) {
 
 async function obtenerTiposDeRemisiones(req, res, next) {
   var consulta = await queryCreator(`select * FROM public.tipo_remisiones;`);
-  var res1 = consulta.rows;
-  return res.send(res1);
+  var dict = {};
+  
+  for (let index = 0; index < consulta.rows.length; index++) {
+    
+    var tipo = JSON.parse(consulta.rows[index].codigo_tipo_remision);
+    var valor = consulta.rows[index].nombre_remision;
+    dict [tipo] = valor;
+    //lista.push({tipo : valor});
+  }
+  console.log(dict);
+
+  return res.send(dict);
 }
 
 remisionesDocenteRouter
@@ -75,7 +85,7 @@ async function docenteObtenerRemisionesEstudiante(req, res, next) {
   var request = req.query;
   var consulta =
     await queryCreator(`select * FROM public.remisiones where documento_docente like
-    '${request.documentoDocente}' and documento_estudiante like '${request.documentoEstudiante}';`);
+    '${request.documentoDocente}';`);
   var res1 = consulta.rows;
   return res.send(res1);
 }

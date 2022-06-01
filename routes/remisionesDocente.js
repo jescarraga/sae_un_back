@@ -83,8 +83,19 @@ remisionesDocenteRouter
 async function docenteObtenerRemisionesEstudiante(req, res, next) {
   var request = req.query;
   var consulta =
-    await queryCreator(`select * FROM public.remisiones where documento_docente like
-    '${request.documentoDocente}';`);
+    await queryCreator(
+      `select 
+      public.remisiones.documento_docente, 
+      public.remisiones.documento_estudiante, 
+      public.remisiones.codigo_plan,
+      public.remisiones.motivo_remision, 
+      public.remisiones.fecha, 
+      public.remisiones.atendida,
+      public.programas_curriculares.nombre_programa_curricular
+      FROM public.remisiones
+      JOIN public.programas_curriculares
+      ON public.programas_curriculares.codigo =  public.remisiones.codigo_plan
+      where documento_docente like '${request.documentoDocente}';`);
   var res1 = consulta.rows;
   return res.send(res1);
 }

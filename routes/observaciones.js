@@ -6,31 +6,33 @@ const sendNull = require("../queryUtilities/queryNull");
 const observacionesRouter = express.Router();
 observacionesRouter.use(bodyParser.json());
 
+function formatObservaciones(listEstudents) {
+  if (listEstudents) {
+    for (let index = 0; index < listEstudents.length; index++) {
+      var lista = [];
+      listEstudents[index].observaciones.forEach((s) => { lista.push(s.split(':')) });
+      listEstudents[index].observaciones = lista;
+    }
+  }
+  return listEstudents;
+}
+
 observacionesRouter.route('/observaciones')
-    .all((req, res, next) => {
-        res.statusCode = 200;
-        next();
-    })
-    .post(docenteR)
-    .get(async (req, res, next) => {
-        var selectEstudiantes = await queryCreator(
-            `select * from public.observaciones_y_estudiantes_docente('${req.query.documento}');`
-        );
-
-        for (let index = 0; index < selectEstudiantes.rows.length; index++) {
-            var lista = [];
-            selectEstudiantes.rows[index].observaciones.forEach((s) => { lista.push(s.split(':')) });
-            selectEstudiantes.rows[index].observaciones = lista;
-        }
-
-        res.send(selectEstudiantes.rows);
-    })
-    .put(sendNull)
-    .delete(sendNull);
+  .all((req, res, next) => {
+    res.statusCode = 200;
+    next();
+  })
+  .post(postObservaciones)
+  .get(async (req, res, next) => {
+    var selectEstudiantes = await queryCreator(`select nombres, apellidos, documento as documento_estudiante, codigo_plan, nombre_programa_curricular, observaciones from public.all_observaciones where documento_docente =  '${req.query.documento}';`);
+    var dataList = formatObservaciones(selectEstudiantes.rows);
+    res.send(dataList);
+  })
+  .put(sendNull)
+  .delete(sendNull);
 
 
-
-async function docenteR(req, res, next) {
+async function postObservaciones(req, res, next) {
   var request = req.body;
   var res1 = await queryCreator(
     `select codigo_plan FROM public.tutores where documento_estudiante = '${request.documento_estudiante}' and documento_docente = '${request.documento_docente}';`
@@ -55,14 +57,17 @@ async function docenteR(req, res, next) {
           insertobservacion,
       };
       return res.send(envio);
+
     } else {
       var resp = { status: true };
       return res.send(resp);
     }
+
   } else {
     res.send({
       status: "ese estudiante no tiene ese plan asociado con ese docente",
     });
+
   }
 }
 
@@ -74,39 +79,29 @@ observacionesRouter
   })
   .post(sendNull)
   .get(async (req, res, next) => {
+
     if (!req.query.busqueda) {
+
       var selectEstudiantes = await queryCreator(
-        `select * from public.all_observaciones()`
+        `SELECT * FROM public.all_observaciones;`
       );
+      var dataList = formatObservaciones(selectEstudiantes.rows);
+      res.send(dataList);
 
-      for (let index = 0; index < selectEstudiantes.rows.length; index++) {
-        var lista = [];
-        selectEstudiantes.rows[index].observaciones.forEach((s) => {
-          lista.push(s.split(":"));
-        });
-        selectEstudiantes.rows[index].observaciones = lista;
-      }
-
-      res.send(selectEstudiantes.rows);
     } else {
+
       var selectEstudiantes = await queryCreator(
-        `select * from public.all_observaciones() where 
-                    documento_docente like '%${req.query.busqueda}%' or 
-                    documento_estudiante like '%${req.query.busqueda}%' or
-                    nombres like '%${req.query.busqueda}%' or 
-                    apellidos like '%${req.query.busqueda}%' or
-                    nombres_docente like '%${req.query.busqueda}%' or
-                    apellidos_docente like '%${req.query.busqueda}%';`
+        `select * from public.all_observaciones where 
+        documento_docente like '%${req.query.busqueda}%' or 
+        documento like '%${req.query.busqueda}%' or
+        nombres like '%${req.query.busqueda}%' or 
+        apellidos like '%${req.query.busqueda}%' or
+        nombre_docente like '%${req.query.busqueda}%' or
+        apellido_docente like '%${req.query.busqueda}%';`
       );
 
-      for (let index = 0; index < selectEstudiantes.rows.length; index++) {
-        var lista = [];
-        selectEstudiantes.rows[index].observaciones.forEach((s) => {
-          lista.push(s.split(":"));
-        });
-        selectEstudiantes.rows[index].observaciones = lista;
-      }
-      res.send(selectEstudiantes.rows);
+      var dataList = formatObservaciones(selectEstudiantes.rows);
+      res.send(dataList);
     }
   })
   .put(sendNull)

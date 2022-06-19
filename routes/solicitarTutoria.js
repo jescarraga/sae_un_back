@@ -46,7 +46,7 @@ async function insertTutoria(req, res, next) {
             '${request.documento_docente}', 
             '${request.documento_estudiante}',  
             '${request.fecha_tutoria}', 
-            5
+            6
             );
         `);
 

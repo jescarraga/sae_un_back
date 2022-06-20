@@ -14,6 +14,7 @@ var ingresoTutorRouter = require("./routes/ingresoTutor");
 var observacionesRouter = require("./routes/observaciones");
 var remisionesDocenteRouter = require("./routes/remisionesDocente");
 const remisionesBienestar = require('./routes/remisionesBienestar');
+const historialTutorias = require('./routes/historialTutorias');
 
 
 var app = express();
@@ -30,7 +31,8 @@ app.use("/", docenteRouter);
 app.use("/", ingresoTutorRouter);
 app.use("/", observacionesRouter);
 app.use("/", remisionesDocenteRouter);
-app.use('/', remisionesBienestar)
+app.use('/', remisionesBienestar);
+app.use('/', historialTutorias);
 
 
 // catch 404 and forward to error handler

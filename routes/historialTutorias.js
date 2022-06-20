@@ -20,13 +20,22 @@ historialTutorias.route('/docente/tutorias/historial')
         docente = req.query.documentoDocente;
         if (docente) {
             if (estudiante){
+                consultaDocente = queryCreator(
+                    `SELECT t.documento_docente, t.documento_estudiante, t.fecha_de_la_tutoria,
+                                t.estado_tutoria, u.nombres as nombre_estudiante, u.apellidos as apellido_estudiante 
+                                FROM tutorias t inner join usuario u on t.documento_estudiante = u.documento  WHERE 
+                                documento_docente = '${docente}' AND documento_estudiante = '${estudiante}'
+                                 AND fecha_de_la_tutoria < CURRENT_DATE ;`
+                ).then((result) => {
+                    return res.json(result.rows);
+                })
             }
             else{
                 consultaDocente = queryCreator(
                     `SELECT t.documento_docente, t.documento_estudiante, t.fecha_de_la_tutoria,
                                 t.estado_tutoria, u.nombres as nombre_estudiante, u.apellidos as apellido_estudiante 
                                 FROM tutorias t inner join usuario u on t.documento_estudiante = u.documento  WHERE 
-                                documento_docente = '${docente}' AND fecha_de_la_tutoria < CURRENT_DATE ; `
+                                documento_docente = '${docente}' AND fecha_de_la_tutoria < CURRENT_DATE ;`
                 ).then((result) => {
                     return res.json(result.rows);
                 })

@@ -31,33 +31,40 @@ async function getTutores(req, res, next) {
 
 async function insertTutoria(req, res, next) {
     var request = req.body;
-
-
     var today = await queryCreator(`select current_date`);//Fecha actual del sistema en la BD
     if (!today.rows) return { status: "Problema verificando la fecha del sistema" };
 
     today = today.rows[0].current_date;
     today = new Date(today);
     appointment = new Date(request.fecha_tutoria);
-
     if (appointment < today) return res.send({ status: "La fecha ingresada es anterior a la actual: " + appointment });
-    if (request.tipo_usuario == "estudiante")request.id_estado_tutoria = 6;
-    if (request.tipo_usuario == "docente") request.id_estado_tutoria = 1;
 
     var actual_state = await queryCreator(`
-    select * from tutorias 
-    where documento_docente = '${request.documento_docente}'
-    and documento_estudiante = '${request.documento_estudiante}'
-    end fecha_de_la_tutoria = '${request.fecha_tutoria}'
+        select * from tutorias 
+            where documento_docente = '${request.documento_docente}'
+            and documento_estudiante = '${request.documento_estudiante}'
+            and fecha_de_la_tutoria = '${request.fecha_tutoria}'
     `);
-    
 
-    //La query puede cambiar porque la BD necesita cambios
+    if (!actual_state.rows) return { status: "Error in BD: " + actual_state };
+    if (request.tipo_usuario == "estudiante" && actual_state.rows.length < 1) request.id_estado_tutoria = 6;
+    if (request.tipo_usuario == "estudiante" && actual_state.rows.length > 0) return res.send({ status: "Este estudiante ya tiene una tutoría en esta fecha con ese docente" });
+    if (request.tipo_usuario == "docente" && actual_state.rows.length < 1) request.id_estado_tutoria = 1;
+
+    if (request.tipo_usuario == "docente" && actual_state.rows.length > 0) {
+        if ((actual_state.rows.estado_tutoria > 1 && actual_state.rows.estado_tutoria < 6)
+            || (request.id_estado_tutoria == 3 && actual_state.rows.estado_tutoria != 1)
+            || ((request.id_estado_tutoria == 1 || 2) && actual_state.rows.estado_tutoria != 6)
+        ) {
+            return res.send({ status: "No se puede cambiar el estado de la tutoria: " + actual_state.rows.estado_tutoria + " al estado: " + request.id_estado_tutoria });
+        }
+    }
+
     var insertTutoria = await queryCreator(`CALL public.insert_tutoria(
             '${request.documento_docente}', 
             '${request.documento_estudiante}',  
             '${request.fecha_tutoria}', 
-            '${request.id_estado_tutoria}'
+            ${request.id_estado_tutoria}
             );
         `);
 

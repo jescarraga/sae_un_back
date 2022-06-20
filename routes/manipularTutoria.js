@@ -40,6 +40,7 @@ async function getTutores(req, res, next) {
 
 async function insertTutoria(req, res, next) {
     var request = req.body;
+    if(request.tipo_usuario != "estudiante" && request.tipo_usuario != "docente") return res.send({status: "tipo usuario no válido"});
     var today = await queryCreator(`select current_date`);//Fecha actual del sistema en la BD
     if (!today.rows[0]) return { status: "Problema verificando la fecha del sistema" };
 

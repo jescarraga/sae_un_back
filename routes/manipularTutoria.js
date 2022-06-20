@@ -25,14 +25,14 @@ async function getTutores(req, res, next) {
     if (!listDocentes.command) {
         return res.send({ status: "Problema al obtener docentes en BD: " + listDocentes });
     } else {
-        return res.send(listDocentes.rows);
+        return res.send(listDocentes.rows[0]);
     }
 }
 
 async function insertTutoria(req, res, next) {
     var request = req.body;
     var today = await queryCreator(`select current_date`);//Fecha actual del sistema en la BD
-    if (!today.rows) return { status: "Problema verificando la fecha del sistema" };
+    if (!today.rows[0]) return { status: "Problema verificando la fecha del sistema" };
 
     today = today.rows[0].current_date;
     today = new Date(today);
@@ -46,17 +46,18 @@ async function insertTutoria(req, res, next) {
             and fecha_de_la_tutoria = '${request.fecha_tutoria}'
     `);
 
-    if (!actual_state.rows) return { status: "Error in BD: " + actual_state };
+    if (!actual_state.rows[0]) return { status: "Error in BD: " + actual_state };
     if (request.tipo_usuario == "estudiante" && actual_state.rows.length < 1) request.id_estado_tutoria = 6;
     if (request.tipo_usuario == "estudiante" && actual_state.rows.length > 0) return res.send({ status: "Este estudiante ya tiene una tutoría en esta fecha con ese docente" });
     if (request.tipo_usuario == "docente" && actual_state.rows.length < 1) request.id_estado_tutoria = 1;
 
     if (request.tipo_usuario == "docente" && actual_state.rows.length > 0) {
-        if ((actual_state.rows.estado_tutoria > 1 && actual_state.rows.estado_tutoria < 6)
-            || (request.id_estado_tutoria == 3 && actual_state.rows.estado_tutoria != 1)
-            || ((request.id_estado_tutoria == 1 || 2) && actual_state.rows.estado_tutoria != 6)
+        if ((actual_state.rows[0].estado_tutoria > 1 && actual_state.rows[0].estado_tutoria < 6)
+            || (request.id_estado_tutoria == 3 && actual_state.rows[0].estado_tutoria != 1)
+            || ((request.id_estado_tutoria == 1 || request.id_estado_tutoria == 2) && actual_state.rows[0].estado_tutoria != 6)
+            || ((request.id_estado_tutoria == 4 || request.id_estado_tutoria == 5) && actual_state.rows[0].estado_tutoria != 1)
         ) {
-            return res.send({ status: "No se puede cambiar el estado de la tutoria: " + actual_state.rows.estado_tutoria + " al estado: " + request.id_estado_tutoria });
+            return res.send({ status: "No se puede cambiar el estado de la tutoria: " + actual_state.rows[0].estado_tutoria + " al estado: " + request.id_estado_tutoria });
         }
     }
 

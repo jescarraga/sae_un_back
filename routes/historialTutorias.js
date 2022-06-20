@@ -73,4 +73,20 @@ historialTutorias.route('/estudiante/tutorias/historial')
     .put(sendNull)
     .delete(sendNull);
 
+historialTutorias.route('/bienestar/tutorias/historial')
+    .all((req, res, next) => {
+        res.statusCode = 200;
+        next();
+    })
+    .get((req, res, next) => {
+        consultaTotal = queryCreator(
+            `SELECT * FROM tutorias t WHERE t.fecha_de_la_tutoria < CURRENT_DATE ;`
+        ).then((result) => {
+            return res.json(result.rows);
+        })
+    })
+    .post(sendNull)
+    .put(sendNull)
+    .delete(sendNull);
+
 module.exports = historialTutorias;

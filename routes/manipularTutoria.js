@@ -25,16 +25,20 @@ manipularTutoria.route('/manipularTutoria')
 
 async function getTutores(req, res, next) {
     var request = req.query;
-    var listDocentes = {};
+    var list = {};
 
     if (request.documento_estudiante) {
-        var listDocentes = await queryCreator(`select * from public.tutoresdeestudiante('${request.documento_estudiante}');`);
+        list = await queryCreator(`select * from public.tutoresdeestudiante('${request.documento_estudiante}');`);
     }
 
-    if (!listDocentes.command) {
-        return res.send({ status: "Problema al obtener docentes en BD: " + listDocentes });
+    if (request.documento_docente) {
+        list = await queryCreator(`select  * from public.tutorado_de_docente('${request.documento_docente}');`);
+    }
+
+    if (!list.command) {
+        return res.send({ status: "Problema al obtener docentes en BD: " + list });
     } else {
-        return res.send(listDocentes.rows[0]);
+        return res.send(list.rows);
     }
 }
 

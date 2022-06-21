@@ -61,8 +61,9 @@ async function insertTutoria(req, res, next) {
     if (request.tipo_usuario == "estudiante" && actual_state.rows.length > 0) return res.send({ status: "Este estudiante ya tiene una tutoría en esta fecha con ese docente" });
     if (request.tipo_usuario == "docente" && actual_state.rows.length < 1) request.id_estado_tutoria = 1;
 
-    var status_in_bd = actual_state.rows[0].estado_tutoria;
+
     if (request.tipo_usuario == "docente" && actual_state.rows.length > 0) {
+        var status_in_bd = actual_state.rows[0].estado_tutoria;
         if ((status_in_bd > 1 && status_in_bd < 6)
             || (request.id_estado_tutoria == 6)
             || (request.id_estado_tutoria == 3 && status_in_bd != 1)

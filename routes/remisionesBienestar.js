@@ -21,8 +21,20 @@ remisionesBienestar.route('/bienestar/remisiones')
         if (Object.keys(req.query).length === 0) { //cuando no hay parámetros
             consultaTotal = queryCreator(
                 //Query para seleccionar todos los estudiantes activos con tutores asignados
-                `SELECT * FROM remisiones;`
-                
+                `select public.remisiones.codigo_remision,
+                (select concat(public.usuario.nombres,' ',public.usuario.apellidos) as nombre_completo
+                from usuario where documento = documento_docente) as nombre_apellido_docente,
+                documento_docente,
+                (select concat(public.usuario.nombres,' ',public.usuario.apellidos) as nombre_completo
+                from usuario where documento = documento_estudiante) as nombre_apellido_estudiante,
+                documento_estudiante,
+                (select public.programas_curriculares.nombre_programa_curricular  as nombre_plan_1
+                from programas_curriculares where public.programas_curriculares.codigo = public.remisiones.codigo_plan) as nombre_plan,
+                (select public.tipo_remisiones.nombre_remision as nombre_remision_1
+                from tipo_remisiones where public.tipo_remisiones.codigo_tipo_remision = public.remisiones.codigo_tipo_remision) as tipo_remision,
+                public.remisiones.fecha
+                from public.remisiones;`
+
 
             ).then((result) => {
                 

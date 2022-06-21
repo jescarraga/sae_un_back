@@ -26,7 +26,7 @@ async function tutorias_pendientes(req, res, next) {
                     '${request.documento}');`
     );
 
-    return res.send(obtener_tutorias_pendientes);
+    return res.send(obtener_tutorias_pendientes.rows);
   }if(!obtener_tutorias_pendientes){
     return res.send({status : 'error'});
   }else{

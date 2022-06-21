@@ -24,7 +24,7 @@ observacionesRouter.route('/observaciones')
   })
   .post(postObservaciones)
   .get(async (req, res, next) => {
-    var selectEstudiantes = await queryCreator(`select nombres, apellidos, documento as documento_estudiante, codigo_plan, nombre_programa_curricular, observaciones from public.all_observaciones where documento_docente =  '${req.query.documento}';`);
+    var selectEstudiantes = await queryCreator(`select nombres, apellidos, documento_estudiante, codigo_plan, nombre_programa_curricular, observaciones from public.all_observaciones where documento_docente =  '${req.query.documento}';`);
     var dataList = formatObservaciones(selectEstudiantes.rows);
     res.send(dataList);
   })

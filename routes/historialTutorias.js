@@ -79,17 +79,30 @@ historialTutorias.route('/bienestar/tutorias/historial')
         next();
     })
     .get((req, res, next) => {
-        consultaTotal = queryCreator(
-            `SELECT t.documento_docente, t.documento_estudiante, t.fecha_de_la_tutoria,
+        docente = req.query.documentoDocente;
+        if (docente) {
+            consultaDocente = queryCreator(
+                `SELECT t.documento_docente, t.documento_estudiante, t.fecha_de_la_tutoria,
+                                t.estado_tutoria, u.nombres as nombre_estudiante, u.apellidos as apellido_estudiante 
+                                FROM tutorias t inner join usuario u on t.documento_estudiante = u.documento  WHERE 
+                                documento_docente = '${docente}' AND fecha_de_la_tutoria < CURRENT_DATE ;`
+            ).then((result) => {
+                return res.json(result.rows);
+            })
+        } else {
+            consultaTotal = queryCreator(
+                `SELECT t.documento_docente, t.documento_estudiante, t.fecha_de_la_tutoria,
                                 t.estado_tutoria, u.nombres as nombre_docente, u.apellidos as apellido_docente, 
                                 e.nombres as nombre_estudiante, e.apellidos as apellido_estudiante 
                                 FROM tutorias t inner join usuario u on t.documento_docente = u.documento inner join
                                 usuario e on t.documento_estudiante = e.documento 
                                 WHERE
                                 fecha_de_la_tutoria < CURRENT_DATE ;`
-        ).then((result) => {
-            return res.json(result.rows);
-        })
+            ).then((result) => {
+                return res.json(result.rows);
+            })
+        }
+
     })
     .post(sendNull)
     .put(sendNull)

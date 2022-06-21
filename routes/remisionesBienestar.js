@@ -32,7 +32,8 @@ remisionesBienestar.route('/bienestar/remisiones')
                 from programas_curriculares where public.programas_curriculares.codigo = public.remisiones.codigo_plan) as nombre_plan,
                 (select public.tipo_remisiones.nombre_remision as nombre_remision_1
                 from tipo_remisiones where public.tipo_remisiones.codigo_tipo_remision = public.remisiones.codigo_tipo_remision) as tipo_remision,
-                public.remisiones.fecha
+                public.remisiones.fecha,
+                public.remisiones.atendida
                 from public.remisiones;`
 
 

@@ -14,6 +14,7 @@ var ingresoTutorRouter = require("./routes/ingresoTutor");
 var observacionesRouter = require("./routes/observaciones");
 var remisionesDocenteRouter = require("./routes/remisionesDocente");
 const remisionesBienestar = require('./routes/remisionesBienestar');
+var tutoriasPenYAceRouter = require('./routes/tutoriasPenYAce');
 const historialTutorias = require('./routes/historialTutorias');
 
 
@@ -31,8 +32,10 @@ app.use("/", docenteRouter);
 app.use("/", ingresoTutorRouter);
 app.use("/", observacionesRouter);
 app.use("/", remisionesDocenteRouter);
-app.use('/', remisionesBienestar);
+app.use('/', remisionesBienestar)
+app.use('/', tutoriasPenYAceRouter)
 app.use('/', historialTutorias);
+
 
 
 // catch 404 and forward to error handler

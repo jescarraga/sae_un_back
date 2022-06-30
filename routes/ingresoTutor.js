@@ -167,11 +167,6 @@ ingresoTutorRouter.route('/ingresoTutor')
                 res.json({
                     "message": "Código de programa inexistente"
                 });
-            } else if (duplicado) {
-                res.statusCode = 400;
-                res.json({
-                    "message": "El estudiante ya tiene un tutor asignado para el programa especificado"
-                });
             } else {
 
                 promInsert.then((inserted) => {
